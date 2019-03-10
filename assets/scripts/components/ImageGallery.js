@@ -64,7 +64,7 @@ function (_Component) {
         if (amount == i + 1) {
           return _react.default.createElement("div", {
             key: i,
-            className: "col-12 col-sm-4 mb2 mb-sm-4",
+            className: "col-12 col-sm-4 mb-4 mb-sm-4",
             onClick: function onClick(e) {
               return _this.onClick(i);
             }
@@ -76,7 +76,7 @@ function (_Component) {
         } else if (amount - 1 == i + 1) {
           return _react.default.createElement("div", {
             key: i,
-            className: "col-6 col-sm-4 mb2 mb-sm-4",
+            className: "col-6 col-sm-4 mb-4 mb-sm-4",
             onClick: function onClick(e) {
               return _this.onClick(i);
             }
@@ -88,7 +88,7 @@ function (_Component) {
         } else if (amount - 2 == i + 1) {
           return _react.default.createElement("div", {
             key: i,
-            className: "col-6 col-sm-4 mb2 mb-sm-4",
+            className: "col-6 col-sm-4 mb-4 mb-sm-4",
             onClick: function onClick(e) {
               return _this.onClick(i);
             }
@@ -100,7 +100,7 @@ function (_Component) {
         } else {
           return _react.default.createElement("div", {
             key: i,
-            className: "col-6 col-sm-3 mb2 mb-sm-4",
+            className: "col-6 col-sm-3 mb-4 mb-sm-4",
             onClick: function onClick(e) {
               return _this.onClick(i);
             }
@@ -123,7 +123,7 @@ function (_Component) {
           return _this.onClose(e);
         }
       }), _react.default.createElement("h1", {
-        className: "text--center p3"
+        className: "text-center p3"
       }, "Image gallery"));
 
       return lightbox;

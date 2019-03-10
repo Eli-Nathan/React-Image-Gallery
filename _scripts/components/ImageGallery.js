@@ -30,7 +30,7 @@ class ImageGallery extends Component {
         return (
           <div
             key={i}
-            className="col-12 col-sm-4 mb2 mb-sm-4"
+            className="col-12 col-sm-4 mb-4 mb-sm-4"
             onClick={e => this.onClick(i)}
           >
             <img
@@ -45,7 +45,7 @@ class ImageGallery extends Component {
         return (
           <div
             key={i}
-            className="col-6 col-sm-4 mb2 mb-sm-4"
+            className="col-6 col-sm-4 mb-4 mb-sm-4"
             onClick={e => this.onClick(i)}
           >
             <img
@@ -60,7 +60,7 @@ class ImageGallery extends Component {
         return (
           <div
             key={i}
-            className="col-6 col-sm-4 mb2 mb-sm-4"
+            className="col-6 col-sm-4 mb-4 mb-sm-4"
             onClick={e => this.onClick(i)}
           >
             <img
@@ -75,7 +75,7 @@ class ImageGallery extends Component {
         return (
           <div
             key={i}
-            className="col-6 col-sm-3 mb2 mb-sm-4"
+            className="col-6 col-sm-3 mb-4 mb-sm-4"
             onClick={e => this.onClick(i)}
           >
             <img
@@ -97,7 +97,7 @@ class ImageGallery extends Component {
           className="float-right close-button"
           onClick={e => this.onClose(e)}
         />
-        <h1 className="text--center p3">Image gallery</h1>
+        <h1 className="text-center p3">Image gallery</h1>
       </div>
     )
     return lightbox

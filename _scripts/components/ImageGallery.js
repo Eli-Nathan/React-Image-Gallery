@@ -12,6 +12,7 @@ class ImageGallery extends Component {
   onClick = (key) => {
     const images = this.props.images
     this.setState({
+      activeImage: key,
       showLightbox: true
     })
   }
@@ -36,7 +37,7 @@ class ImageGallery extends Component {
             <img
               src={image.path}
               alt={image.alt}
-              className="img-fluid"
+              className="img-fluid gallery-image"
             />
           </div>
         )
@@ -51,7 +52,7 @@ class ImageGallery extends Component {
             <img
               src={image.path}
               alt={image.alt}
-              className="img-fluid"
+              className="img-fluid gallery-image"
             />
           </div>
         )
@@ -66,7 +67,7 @@ class ImageGallery extends Component {
             <img
               src={image.path}
               alt={image.alt}
-              className="img-fluid"
+              className="img-fluid gallery-image"
             />
           </div>
         )
@@ -81,13 +82,34 @@ class ImageGallery extends Component {
             <img
               src={image.path}
               alt={image.alt}
-              className="img-fluid"
+              className="img-fluid gallery-image"
             />
           </div>
         )
       }
     })
     return images
+  }
+
+  renderImage = () => {
+    return (
+      <img
+        src={this.props.images[this.state.activeImage].path}
+        className="img-fluid featuredImage"
+      />
+    )
+  }
+
+  renderNavigation = () => {
+    return (
+      <p>Arrows</p>
+    )
+  }
+
+  renderThumbnails = () => {
+    return (
+      <p>Thumbnails</p>
+    )
   }
 
   renderLightbox = () => {
@@ -97,7 +119,9 @@ class ImageGallery extends Component {
           className="float-right close-button"
           onClick={e => this.onClose(e)}
         />
-        <h1 className="text-center p3">Image gallery</h1>
+        {this.renderImage()}
+        {this.renderNavigation()}
+        {this.renderThumbnails()}
       </div>
     )
     return lightbox
@@ -107,7 +131,7 @@ class ImageGallery extends Component {
     return (
       <div className="row">
         {this.renderImages()}
-        {this.renderLightbox()}
+        {this.state.showLightbox ? this.renderLightbox() : null}
       </div>
     );
   }

@@ -8,6 +8,10 @@ body {
   position: relative;
 }
 
+img.gallery-image {
+  cursor: pointer;
+}
+
 .lightbox {
   display: none;
 
@@ -21,11 +25,21 @@ body {
     background-color: rgba(#000, .9);
     color: #fff;
 
+    .featuredImage {
+      width: 75%;
+      height: auto;
+      margin: 0 auto;
+    }
+
     .close-button {
-      width: 50px;
-      height: 50px;
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      right: 0;
       margin: 48px 56px;
-      background: url(data:image/svg;base64,Cjxzdmcgd2lkdGg9IjM2IiBoZWlnaHQ9IjM2IiB2aWV3Qm94PSIwIDAgMzYgMzYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRpdGxlPmNsb3NlPC90aXRsZT48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgZmlsbD0iIiBjeD0iMTgiIGN5PSIxOCIgcj0iMTgiLz48cGF0aCBkPSJNMTggMTcuMDJsLTUuODc0LTUuODczLS45OC45NzlMMTcuMDIyIDE4bC01Ljg3NCA1Ljg3NC45NzkuOThMMTggMTguOTc4bDUuODc0IDUuODc0Ljk4LS45NzlMMTguOTc4IDE4bDUuODc0LTUuODc0LS45NzktLjk4TDE4IDE3LjAyMnoiIGZpbGw9IiNmZmYiLz48L2c+PC9zdmc+Cg==) no repeat center center;
+      background: url("/assets/images/close.svg") no-repeat center center;
+      border: none;
+      cursor: pointer;
     }
   }
 }

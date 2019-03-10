@@ -46,6 +46,7 @@ function (_Component) {
       var images = _this.props.images;
 
       _this.setState({
+        activeImage: key,
         showLightbox: true
       });
     });
@@ -71,7 +72,7 @@ function (_Component) {
           }, _react.default.createElement("img", {
             src: image.path,
             alt: image.alt,
-            className: "img-fluid"
+            className: "img-fluid gallery-image"
           }));
         } else if (amount - 1 == i + 1) {
           return _react.default.createElement("div", {
@@ -83,7 +84,7 @@ function (_Component) {
           }, _react.default.createElement("img", {
             src: image.path,
             alt: image.alt,
-            className: "img-fluid"
+            className: "img-fluid gallery-image"
           }));
         } else if (amount - 2 == i + 1) {
           return _react.default.createElement("div", {
@@ -95,7 +96,7 @@ function (_Component) {
           }, _react.default.createElement("img", {
             src: image.path,
             alt: image.alt,
-            className: "img-fluid"
+            className: "img-fluid gallery-image"
           }));
         } else {
           return _react.default.createElement("div", {
@@ -107,11 +108,26 @@ function (_Component) {
           }, _react.default.createElement("img", {
             src: image.path,
             alt: image.alt,
-            className: "img-fluid"
+            className: "img-fluid gallery-image"
           }));
         }
       });
       return images;
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderImage", function () {
+      return _react.default.createElement("img", {
+        src: _this.props.images[_this.state.activeImage].path,
+        className: "img-fluid featuredImage"
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderNavigation", function () {
+      return _react.default.createElement("p", null, "Arrows");
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderThumbnails", function () {
+      return _react.default.createElement("p", null, "Thumbnails");
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderLightbox", function () {
@@ -122,9 +138,7 @@ function (_Component) {
         onClick: function onClick(e) {
           return _this.onClose(e);
         }
-      }), _react.default.createElement("h1", {
-        className: "text-center p3"
-      }, "Image gallery"));
+      }), _this.renderImage(), _this.renderNavigation(), _this.renderThumbnails());
 
       return lightbox;
     });
@@ -140,7 +154,7 @@ function (_Component) {
     value: function render() {
       return _react.default.createElement("div", {
         className: "row"
-      }, this.renderImages(), this.renderLightbox());
+      }, this.renderImages(), this.state.showLightbox ? this.renderLightbox() : null);
     }
   }]);
 

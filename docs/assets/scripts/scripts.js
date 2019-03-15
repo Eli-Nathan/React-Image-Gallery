@@ -42,32 +42,107 @@ function (_Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(ImageGallery).call(this, props));
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "onClick", function (key) {
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleKeyDown", function (event) {
+      // If the lightbox is showing
+      if (_this.state.showLightbox) {
+        // Define buttons and keycodes
+        var lastArrow = document.querySelector(".lightbox .arrows .arrows__right");
+        var closeIcon = document.querySelector(".lightbox .close-button");
+        var TAB = 9;
+        var ESCAPE_KEY = 27;
+        var LEFT_ARROW = 37;
+        var RIGHT_ARROW = 39; // If esc is clicked, call the close function
+
+        if (event.keyCode == ESCAPE_KEY) _this.onClose(); // If left arrow is clicked, call the changeImage function
+
+        if (event.keyCode == LEFT_ARROW) _this.changeImage(-1); // If left arrow is clicked, call the changeImage function
+
+        if (event.keyCode == RIGHT_ARROW) _this.changeImage(1); // If tab is clicked, keep focus on the arrows
+
+        if (event.keyCode == TAB && document.activeElement == lastArrow) {
+          closeIcon.focus();
+        }
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "onClick", function (e, key) {
+      // Prevent default action (href="#")
+      e.preventDefault();
+      /*
+        Set state:
+          activeImage = the image's index in the array of images
+          showLightbox = true
+        Callback:
+          - Get left arrow button and focus on it
+          - Add no scroll class to body
+          - Call scrollToThumb function
+      */
+
       _this.setState({
         activeImage: key,
         showLightbox: true
-      }); // element.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+      }, function () {
+        document.querySelector(".lightbox .arrows .arrows__left").focus();
+        document.body.classList.add("no-scroll");
 
+        _this.scrollToThumb();
+      });
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "onClose", function () {
+      /*
+        Set state:
+          showLightbox = false
+        Callback:
+          - Remove no scroll class from body
+      */
       _this.setState({
         showLightbox: false
+      }, function () {
+        return document.body.classList.remove("no-scroll");
       });
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "changeImage", function (calc) {
+      // If first image is active and parameter is -1
       if (_this.state.activeImage == 0 && calc == -1) {
+        // set parameter to the length of the array to go right to the last image
         calc = _this.props.images.length - 1;
-      } else if (_this.state.activeImage == _this.props.images.length - 1 && calc == 1) {
-        calc = -(_this.props.images.length - 1);
-      }
+      } // If last image is active and parameter is 1
+      else if (_this.state.activeImage == _this.props.images.length - 1 && calc == 1) {
+          // set parameter to the (negative)length of the array to go right to the first image
+          calc = -(_this.props.images.length - 1);
+        }
+      /*
+        Set state:
+          activeImage = selected image + or - calc amount
+        Callback:
+          - Call scrollToThumb function
+      */
+
 
       _this.setState(function (state) {
         return {
           activeImage: state.activeImage + calc
         };
+      }, function () {
+        return _this.scrollToThumb();
       });
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "scrollToThumb", function () {
+      /* Define variables for:
+        - Thumbs div
+        - First thumbnail div
+        - Active thumbnail div
+        - X-axis offset of first div
+      */
+      var thumbs = document.querySelector(".thumbs");
+      var firstThumb = document.querySelectorAll(".thumb")[0];
+      var activeThumb = document.querySelector(".thumb--active");
+      var firstOffset = firstThumb.offsetLeft; // Set the scroll position to show the selected thumb with some space to the left (200px)
+
+      thumbs.scrollLeft = activeThumb.offsetLeft - firstOffset - 200;
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderImages", function () {
@@ -80,7 +155,7 @@ function (_Component) {
             key: i + 100,
             className: "col-12 col-sm-4 mb-4 mb-sm-4",
             onClick: function onClick(e) {
-              return _this.onClick(i);
+              return _this.onClick(e, i);
             }
           }, _react.default.createElement("img", {
             src: image.path,
@@ -92,7 +167,7 @@ function (_Component) {
             key: i,
             className: "col-6 col-sm-4 mb-4 mb-sm-4",
             onClick: function onClick(e) {
-              return _this.onClick(i);
+              return _this.onClick(e, i);
             }
           }, _react.default.createElement("img", {
             src: image.path,
@@ -104,7 +179,7 @@ function (_Component) {
             key: i,
             className: "col-6 col-sm-4 mb-4 mb-sm-4",
             onClick: function onClick(e) {
-              return _this.onClick(i);
+              return _this.onClick(e, i);
             }
           }, _react.default.createElement("img", {
             src: image.path,
@@ -116,7 +191,7 @@ function (_Component) {
             key: i,
             className: "col-6 col-sm-3 mb-4 mb-sm-4",
             onClick: function onClick(e) {
-              return _this.onClick(i);
+              return _this.onClick(e, i);
             }
           }, _react.default.createElement("img", {
             src: image.path,
@@ -137,6 +212,9 @@ function (_Component) {
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderLightbox", function () {
+      // Listen for keydown event and call function
+      document.addEventListener("keydown", _this.handleKeyDown);
+
       var lightbox = _react.default.createElement("div", {
         className: "lightbox ".concat(_this.state.showLightbox ? "lightbox--visible" : "")
       }, _react.default.createElement("button", {
@@ -153,11 +231,11 @@ function (_Component) {
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderImage", function () {
       return _react.default.createElement("figure", {
-        className: "d-none d-md-block"
+        className: "d-none d-md-block text-center"
       }, _react.default.createElement("img", {
         src: _this.props.images[_this.state.activeImage].path,
         alt: _this.props.images[_this.state.activeImage].alt,
-        className: "featuredImage mt-md-4 mx-auto"
+        className: "featuredImage mt-md-4 mx-md-auto text-center"
       }), _react.default.createElement("figcaption", {
         className: "caption mt-1 mx-auto"
       }, _this.props.images[_this.state.activeImage].caption));
@@ -189,9 +267,9 @@ function (_Component) {
       var thumbs = _this.props.images.map(function (image, i) {
         return _react.default.createElement("div", {
           key: i,
-          className: "thumb mb-3 d-inline ".concat(i === _this.state.activeImage ? " thumb--active" : null),
+          className: "thumb mb-3 mb-md-0 ".concat(i === _this.state.activeImage ? " thumb--active" : ""),
           onClick: function onClick(e) {
-            return _this.onClick(i);
+            return _this.onClick(e, i);
           }
         }, _react.default.createElement("figure", null, _react.default.createElement("img", {
           src: _this.props.images[i].path,
@@ -209,7 +287,8 @@ function (_Component) {
       showLightbox: false
     };
     return _this;
-  }
+  } // Handle Keydown function with event parameter
+
 
   _createClass(ImageGallery, [{
     key: "render",

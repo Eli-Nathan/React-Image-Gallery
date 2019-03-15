@@ -4,16 +4,17 @@
 @import url('https://fonts.googleapis.com/css?family=Varela+Round');
 
 body {
-  font-family: "Varela Round", "Roboto", verdana, sans-serif;
   position: relative;
-}
 
-img.gallery-image {
-  cursor: pointer;
+  &.no-scroll {
+    overflow:hidden;
+  }
 }
 
 .lightbox {
   display: none;
+  z-index: 1000;
+  overflow: scroll;
 
   &--visible {
     display: block;
@@ -26,20 +27,120 @@ img.gallery-image {
     color: #fff;
 
     .featuredImage {
-      width: 75%;
-      height: auto;
-      margin: 0 auto;
+      width: 95%;
+
+      @include media-breakpoint-up(md) {
+        width: 50%;
+      }
+
+      @media (min-width: 1800px) {
+        margin-top: 96px;
+      }
+    }
+
+    .caption {
+      width: 95%;
+      margin-bottom: 24px;
+
+      @include media-breakpoint-up(md) {
+        margin-bottom: 24px;
+        width: 50%;
+        text-align: center;
+      }
+    }
+
+    .thumbs {
+      width: 95%;
+
+      @include media-breakpoint-up(md) {
+        width: 50%;
+        height: 80px;
+        // overflow: hidden;
+        overflow-x:scroll;
+        white-space:nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .thumb {
+        width: 100%;
+
+        @include media-breakpoint-up(md) {
+          width: 100px;
+          display:inline-block;
+          margin-right: 14px;
+
+          &:last-of-type {
+            margin-right: 0;
+          }
+        }
+
+        &--active {
+          @include media-breakpoint-up(md) {
+            border: 2px solid #fff;
+          }
+        }
+
+        .caption {
+          width: 100%;
+          margin-bottom: 24px;
+
+          @include media-breakpoint-up(md) {
+            margin-bottom: 48px;
+            width: 50%;
+          }
+        }
+      }
+
     }
 
     .close-button {
-      position: absolute;
-      width: 24px;
-      height: 24px;
+      position: fixed;
+      width: 48px;
+      height: 48px;
       right: 0;
-      margin: 48px 56px;
-      background: url("/assets/images/close.svg") no-repeat center center;
+      margin: 18px 21px;
+      background: transparent url("/assets/images/close.svg") no-repeat center center / contain;
       border: none;
       cursor: pointer;
+
+      @include media-breakpoint-up(md) {
+        position: absolute;
+        margin: 0.1% 24%;
+      }
+
+      @media (min-width: 1800px) {
+        margin: 2% 25%;
+      }
+    }
+
+    .arrows {
+      display: none;
+
+      @include media-breakpoint-up(md) {
+        position: relative;
+        display: block;
+        margin-top: -25%;
+      }
+
+      &__left {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background: url("/assets/images/left-arrow.svg") no-repeat center center / contain;
+        left: 20%;
+        border: none;
+        cursor: pointer;
+      }
+
+      &__right {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background: url("/assets/images/right-arrow.svg") no-repeat center center / contain;
+        right: 20%;
+        border: none;
+        cursor: pointer;
+      }
     }
   }
 }

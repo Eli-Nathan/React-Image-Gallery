@@ -43,17 +43,30 @@ function (_Component) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(ImageGallery).call(this, props));
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "onClick", function (key) {
-      var images = _this.props.images;
-
       _this.setState({
         activeImage: key,
         showLightbox: true
-      });
+      }); // element.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "onClose", function () {
       _this.setState({
         showLightbox: false
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "changeImage", function (calc) {
+      if (_this.state.activeImage == 0 && calc == -1) {
+        calc = _this.props.images.length - 1;
+      } else if (_this.state.activeImage == _this.props.images.length - 1 && calc == 1) {
+        calc = -(_this.props.images.length - 1);
+      }
+
+      _this.setState(function (state) {
+        return {
+          activeImage: state.activeImage + calc
+        };
       });
     });
 
@@ -64,7 +77,7 @@ function (_Component) {
       var images = cleanedImages.map(function (image, i) {
         if (amount == i + 1) {
           return _react.default.createElement("div", {
-            key: i,
+            key: i + 100,
             className: "col-12 col-sm-4 mb-4 mb-sm-4",
             onClick: function onClick(e) {
               return _this.onClick(i);
@@ -115,13 +128,6 @@ function (_Component) {
       return images;
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderImage", function () {
-      return _react.default.createElement("img", {
-        src: _this.props.images[_this.state.activeImage].path,
-        className: "img-fluid featuredImage"
-      });
-    });
-
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderNavigation", function () {
       return _react.default.createElement("p", null, "Arrows");
     });
@@ -138,9 +144,65 @@ function (_Component) {
         onClick: function onClick(e) {
           return _this.onClose(e);
         }
-      }), _this.renderImage(), _this.renderNavigation(), _this.renderThumbnails());
+      }), _this.renderImage(), _this.renderCounter(), _react.default.createElement("div", {
+        className: "thumbs mx-auto"
+      }, _this.renderThumbnails()), _this.renderNavigation());
 
       return lightbox;
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderImage", function () {
+      return _react.default.createElement("figure", {
+        className: "d-none d-md-block"
+      }, _react.default.createElement("img", {
+        src: _this.props.images[_this.state.activeImage].path,
+        alt: _this.props.images[_this.state.activeImage].alt,
+        className: "featuredImage mt-md-4 mx-auto"
+      }), _react.default.createElement("figcaption", {
+        className: "caption mt-1 mx-auto"
+      }, _this.props.images[_this.state.activeImage].caption));
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderCounter", function () {
+      return _react.default.createElement("p", {
+        className: "counter d-none d-md-block text-center"
+      }, "Image ".concat(_this.state.activeImage + 1, "/").concat(_this.props.images.length));
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderNavigation", function () {
+      return _react.default.createElement("div", {
+        className: "arrows"
+      }, _react.default.createElement("button", {
+        className: "arrows__left",
+        onClick: function onClick(e) {
+          return _this.changeImage(-1);
+        }
+      }), _react.default.createElement("button", {
+        className: "arrows__right",
+        onClick: function onClick(e) {
+          return _this.changeImage(1);
+        }
+      }));
+    });
+
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderThumbnails", function () {
+      var thumbs = _this.props.images.map(function (image, i) {
+        return _react.default.createElement("div", {
+          key: i,
+          className: "thumb mb-3 d-inline ".concat(i === _this.state.activeImage ? " thumb--active" : null),
+          onClick: function onClick(e) {
+            return _this.onClick(i);
+          }
+        }, _react.default.createElement("figure", null, _react.default.createElement("img", {
+          src: _this.props.images[i].path,
+          alt: _this.props.images[i].alt,
+          className: "img-fluid mx-auto"
+        }), _react.default.createElement("figcaption", {
+          className: "caption mt-1 mx-auto d-md-none"
+        }, _this.props.images[i].caption)));
+      });
+
+      return thumbs;
     });
 
     _this.state = {

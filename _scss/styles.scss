@@ -11,6 +11,10 @@ body {
   }
 }
 
+.gallery-image {
+  cursor: pointer;
+}
+
 .lightbox {
   display: none;
   z-index: 1000;
@@ -28,8 +32,14 @@ body {
 
     .featuredImage {
       width: 95%;
+      height: auto;
 
       @include media-breakpoint-up(md) {
+        margin-top: 48px;
+        width: 75%;
+      }
+
+      @include media-breakpoint-up(lg) {
         width: 50%;
       }
 
@@ -43,26 +53,41 @@ body {
       margin-bottom: 24px;
 
       @include media-breakpoint-up(md) {
-        margin-bottom: 24px;
-        width: 50%;
+        width: 75%;
         text-align: center;
+      }
+
+      @include media-breakpoint-up(lg) {
+        width: 50%;
       }
     }
 
     .thumbs {
       width: 95%;
+      display: block;
 
       @include media-breakpoint-up(md) {
-        width: 50%;
-        height: 80px;
-        // overflow: hidden;
+        width: 75%;
+        overflow: hidden;
+        scroll-behavior: smooth;
         overflow-x:scroll;
         white-space:nowrap;
         -webkit-overflow-scrolling: touch;
       }
 
+      @include media-breakpoint-up(lg) {
+        width: 50%;
+      }
+
+      @include media-breakpoint-up(xxl) {
+        display: flex;
+        justify-content: center;
+      }
+
       .thumb {
         width: 100%;
+        margin-top: 24px;
+        cursor: pointer;
 
         @include media-breakpoint-up(md) {
           width: 100px;
@@ -80,17 +105,24 @@ body {
           }
         }
 
+        img {
+          width: 100%;
+        }
+
         .caption {
           width: 100%;
           margin-bottom: 24px;
 
           @include media-breakpoint-up(md) {
             margin-bottom: 48px;
+            width: 75%;
+          }
+
+          @include media-breakpoint-up(lg) {
             width: 50%;
           }
         }
       }
-
     }
 
     .close-button {
@@ -105,10 +137,10 @@ body {
 
       @include media-breakpoint-up(md) {
         position: absolute;
-        margin: 0.1% 24%;
+        margin: 1% 1%;
       }
 
-      @media (min-width: 1800px) {
+      @include media-breakpoint-up(xxl) {
         margin: 2% 25%;
       }
     }
@@ -119,6 +151,12 @@ body {
       @include media-breakpoint-up(md) {
         position: relative;
         display: block;
+        margin-top: -31%;
+      }
+
+      @include media-breakpoint-up(xxl) {
+        position: relative;
+        display: block;
         margin-top: -25%;
       }
 
@@ -127,9 +165,13 @@ body {
         width: 50px;
         height: 50px;
         background: url("/assets/images/left-arrow.svg") no-repeat center center / contain;
-        left: 20%;
+        left: 5%;
         border: none;
         cursor: pointer;
+
+        @include media-breakpoint-up(md) {
+          left: 20%;
+        }
       }
 
       &__right {
@@ -137,9 +179,13 @@ body {
         width: 50px;
         height: 50px;
         background: url("/assets/images/right-arrow.svg") no-repeat center center / contain;
-        right: 20%;
+        right: 5%;
         border: none;
         cursor: pointer;
+
+        @include media-breakpoint-up(md) {
+          right: 20%;
+        }
       }
     }
   }

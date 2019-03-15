@@ -9,30 +9,103 @@ class ImageGallery extends Component {
     }
   }
 
-  onClick = (key) => {
-  this.setState({
-    activeImage: key,
-    showLightbox: true
-  })
-  // element.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-}
+  // Handle Keydown function with event parameter
+  handleKeyDown = (event) => {
+    // If the lightbox is showing
+    if(this.state.showLightbox) {
+      // Define buttons and keycodes
+      let lastArrow = document.querySelector(".lightbox .arrows .arrows__right")
+      let closeIcon = document.querySelector(".lightbox .close-button")
+      let TAB = 9
+      let ESCAPE_KEY = 27
+      let LEFT_ARROW = 37
+      let RIGHT_ARROW = 39
+      // If esc is clicked, call the close function
+      if(event.keyCode == ESCAPE_KEY) this.onClose()
+      // If left arrow is clicked, call the changeImage function
+      if(event.keyCode == LEFT_ARROW) this.changeImage(-1)
+      // If left arrow is clicked, call the changeImage function
+      if(event.keyCode == RIGHT_ARROW) this.changeImage(1)
+      // If tab is clicked, keep focus on the arrows
+      if(event.keyCode == TAB && document.activeElement == lastArrow) {
+        closeIcon.focus()
+      }
+    }
+  }
 
-  onClose = () => {
+  // onClick function
+  onClick = (e, key) => {
+    // Prevent default action (href="#")
+    e.preventDefault()
+    /*
+      Set state:
+        activeImage = the image's index in the array of images
+        showLightbox = true
+      Callback:
+        - Get left arrow button and focus on it
+        - Add no scroll class to body
+        - Call scrollToThumb function
+    */
     this.setState({
-      showLightbox: false
+      activeImage: key,
+      showLightbox: true
+    }, () => {
+      document.querySelector(".lightbox .arrows .arrows__left").focus()
+      document.body.classList.add("no-scroll")
+      this.scrollToThumb()
     })
   }
 
+  // onClose function
+  onClose = () => {
+    /*
+      Set state:
+        showLightbox = false
+      Callback:
+        - Remove no scroll class from body
+    */
+    this.setState({
+      showLightbox: false
+    }, () => document.body.classList.remove("no-scroll"))
+  }
+
+  // changeImage function
   changeImage = (calc) => {
+    // If first image is active and parameter is -1
     if (this.state.activeImage == 0 && calc == -1) {
+      // set parameter to the length of the array to go right to the last image
       calc = this.props.images.length - 1
     }
+    // If last image is active and parameter is 1
     else if (this.state.activeImage == (this.props.images.length -1) && calc == 1) {
+      // set parameter to the (negative)length of the array to go right to the first image
       calc = -(this.props.images.length -1)
     }
+    /*
+      Set state:
+        activeImage = selected image + or - calc amount
+      Callback:
+        - Call scrollToThumb function
+    */
     this.setState(state => ({
       activeImage: state.activeImage + calc
-    }))
+    }), () => this.scrollToThumb())
+  }
+
+  // scrollToThumb function
+  scrollToThumb = () => {
+    /* Define variables for:
+      - Thumbs div
+      - First thumbnail div
+      - Active thumbnail div
+      - X-axis offset of first div
+    */
+    let thumbs = document.querySelector(".thumbs")
+    let firstThumb = document.querySelectorAll(".thumb")[0]
+    let activeThumb = document.querySelector(".thumb--active")
+    let firstOffset = firstThumb.offsetLeft
+    // Set the scroll position to show the selected thumb with some space to the left (200px)
+    thumbs.scrollLeft = activeThumb.offsetLeft - firstOffset - 200
   }
 
   renderImages = () => {
@@ -44,7 +117,7 @@ class ImageGallery extends Component {
           <div
             key={i+100}
             className="col-12 col-sm-4 mb-4 mb-sm-4"
-            onClick={e => this.onClick(i)}
+            onClick={e => this.onClick(e, i)}
           >
             <img
               src={image.path}
@@ -59,7 +132,7 @@ class ImageGallery extends Component {
           <div
             key={i}
             className="col-6 col-sm-4 mb-4 mb-sm-4"
-            onClick={e => this.onClick(i)}
+            onClick={e => this.onClick(e, i)}
           >
             <img
               src={image.path}
@@ -74,7 +147,7 @@ class ImageGallery extends Component {
           <div
             key={i}
             className="col-6 col-sm-4 mb-4 mb-sm-4"
-            onClick={e => this.onClick(i)}
+            onClick={e => this.onClick(e, i)}
           >
             <img
               src={image.path}
@@ -89,7 +162,7 @@ class ImageGallery extends Component {
           <div
             key={i}
             className="col-6 col-sm-3 mb-4 mb-sm-4"
-            onClick={e => this.onClick(i)}
+            onClick={e => this.onClick(e, i)}
           >
             <img
               src={image.path}
@@ -116,6 +189,8 @@ class ImageGallery extends Component {
   }
 
   renderLightbox = () => {
+    // Listen for keydown event and call function
+    document.addEventListener("keydown", this.handleKeyDown)
     const lightbox = (
       <div className={`lightbox ${this.state.showLightbox ? "lightbox--visible" : ""}`}>
         <button
@@ -135,11 +210,11 @@ class ImageGallery extends Component {
 
   renderImage = () => {
     return (
-      <figure className="d-none d-md-block">
+      <figure className="d-none d-md-block text-center">
         <img
           src={this.props.images[this.state.activeImage].path}
           alt={this.props.images[this.state.activeImage].alt}
-          className="featuredImage mt-md-4 mx-md-auto"
+          className="featuredImage mt-md-4 mx-md-auto text-center"
         />
         <figcaption className="caption mt-1 mx-auto">{this.props.images[this.state.activeImage].caption}</figcaption>
       </figure>
@@ -174,8 +249,8 @@ class ImageGallery extends Component {
       return (
         <div
           key={i}
-          className={`thumb mb-3 d-inline ${i === this.state.activeImage ? " thumb--active" : null}`}
-          onClick={e => this.onClick(i)}
+          className={`thumb mb-3 mb-md-0 ${i === this.state.activeImage ? " thumb--active" : ""}`}
+          onClick={e => this.onClick(e, i)}
         >
           <figure>
             <img

@@ -114,7 +114,8 @@ class ImageGallery extends Component {
     const images = cleanedImages.map((image, i) => {
       if(amount == i + 1) {
         return (
-          <div
+          <a
+            href="#"
             key={i+100}
             className="col-12 col-sm-4 mb-4 mb-sm-4"
             onClick={e => this.onClick(e, i)}
@@ -124,12 +125,13 @@ class ImageGallery extends Component {
               alt={image.alt}
               className="img-fluid gallery-image"
             />
-          </div>
+          </a>
         )
       }
       else if((amount - 1) == i + 1) {
         return (
-          <div
+          <a
+            href="#"
             key={i}
             className="col-6 col-sm-4 mb-4 mb-sm-4"
             onClick={e => this.onClick(e, i)}
@@ -139,12 +141,13 @@ class ImageGallery extends Component {
               alt={image.alt}
               className="img-fluid gallery-image"
             />
-          </div>
+          </a>
         )
       }
       else if((amount - 2) == i + 1) {
         return (
-          <div
+          <a
+            href="#"
             key={i}
             className="col-6 col-sm-4 mb-4 mb-sm-4"
             onClick={e => this.onClick(e, i)}
@@ -154,12 +157,13 @@ class ImageGallery extends Component {
               alt={image.alt}
               className="img-fluid gallery-image"
             />
-          </div>
+          </a>
         )
       }
       else {
         return (
-          <div
+          <a
+            href="#"
             key={i}
             className="col-6 col-sm-3 mb-4 mb-sm-4"
             onClick={e => this.onClick(e, i)}
@@ -169,23 +173,11 @@ class ImageGallery extends Component {
               alt={image.alt}
               className="img-fluid gallery-image"
             />
-          </div>
+          </a>
         )
       }
     })
     return images
-  }
-
-  renderNavigation = () => {
-    return (
-      <p>Arrows</p>
-    )
-  }
-
-  renderThumbnails = () => {
-    return (
-      <p>Thumbnails</p>
-    )
   }
 
   renderLightbox = () => {

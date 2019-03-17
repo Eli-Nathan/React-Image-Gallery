@@ -151,7 +151,8 @@ function (_Component) {
       var amount = cleanedImages.length;
       var images = cleanedImages.map(function (image, i) {
         if (amount == i + 1) {
-          return _react.default.createElement("div", {
+          return _react.default.createElement("a", {
+            href: "#",
             key: i + 100,
             className: "col-12 col-sm-4 mb-4 mb-sm-4",
             onClick: function onClick(e) {
@@ -163,7 +164,8 @@ function (_Component) {
             className: "img-fluid gallery-image"
           }));
         } else if (amount - 1 == i + 1) {
-          return _react.default.createElement("div", {
+          return _react.default.createElement("a", {
+            href: "#",
             key: i,
             className: "col-6 col-sm-4 mb-4 mb-sm-4",
             onClick: function onClick(e) {
@@ -175,7 +177,8 @@ function (_Component) {
             className: "img-fluid gallery-image"
           }));
         } else if (amount - 2 == i + 1) {
-          return _react.default.createElement("div", {
+          return _react.default.createElement("a", {
+            href: "#",
             key: i,
             className: "col-6 col-sm-4 mb-4 mb-sm-4",
             onClick: function onClick(e) {
@@ -187,7 +190,8 @@ function (_Component) {
             className: "img-fluid gallery-image"
           }));
         } else {
-          return _react.default.createElement("div", {
+          return _react.default.createElement("a", {
+            href: "#",
             key: i,
             className: "col-6 col-sm-3 mb-4 mb-sm-4",
             onClick: function onClick(e) {
@@ -201,14 +205,6 @@ function (_Component) {
         }
       });
       return images;
-    });
-
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderNavigation", function () {
-      return _react.default.createElement("p", null, "Arrows");
-    });
-
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderThumbnails", function () {
-      return _react.default.createElement("p", null, "Thumbnails");
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderLightbox", function () {

@@ -24,8 +24,584 @@ current: home
   </div>
 </div>
 
+<div class="intro">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <p>A completely accessible image gallery allowing you to tab through the lightbox arrows with focus contained within it rather than the whole document while it is open.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="gallery">
   <div class="container">
     <div id="image-gallery"></div>
+  </div>
+</div>
+
+<div class="code mt-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-10 offset-md-1 code-section">
+        <div class="container code-snippets">
+          <h2 class="text-center my-3">View code</h2>
+          <hr>
+          <h5>Main JS file</h5>
+          <pre class="language-js"><code class="language-js">import React from 'react'
+import ReactDOM from 'react-dom'
+import ImageGallery from './components/ImageGallery'
+
+let imageGallery = document.getElementById("image-gallery")
+const images = [
+  {
+    path: "https://images.unsplash.com/photo-1550851985-f79ef89f3578?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1510&q=80",
+    alt: "BMW in the sun",
+    caption: "BMW 5-series in a lumber yard"
+  },
+  {
+    path: "https://images.unsplash.com/photo-1551115190-75708aec3314?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1510&h=1000&fit=crop&ixid=eyJhcHBfaWQiOjF9",
+    alt: "Departure lounge",
+    caption: "Departure lounge"
+  },
+  {
+    path: "https://images.unsplash.com/photo-1551708769-d1525c52cccc?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1510&h=1000&fit=crop&ixid=eyJhcHBfaWQiOjF9",
+    alt: "Stack of vinyls",
+    caption: "Stack of vinyls with Queen record at the top"
+  },
+  {
+    path: "https://images.unsplash.com/photo-1550945135-3f8d8b938111?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1510&h=1000&fit=crop&ixid=eyJhcHBfaWQiOjF9",
+    alt: "Bus",
+    caption: "London Buss"
+  },
+  {
+    path: "https://images.unsplash.com/photo-1549780450-4e6066b727df?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1510&h=1000&fit=crop&ixid=eyJhcHBfaWQiOjF9",
+    alt: "Sheep in field",
+    caption: "Sheep in field"
+  },
+  {
+    path: "https://images.unsplash.com/photo-1551010457-3cdd802dfa3c?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1510&h=1000&fit=crop&ixid=eyJhcHBfaWQiOjF9",
+    alt: "Alleyway",
+    caption: "Alleyway in Eastern City"
+  },
+  {
+    path: "https://images.unsplash.com/photo-1550837725-bdcb030d1e54?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1510&h=1000&fit=crop&ixid=eyJhcHBfaWQiOjF9",
+    alt: "Newyork",
+    caption: "Newyork city-scape"
+  },
+  {
+    path: "https://images.unsplash.com/photo-1551525212-a1dc18871d4a?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1510&h=1000&fit=crop&ixid=eyJhcHBfaWQiOjF9",
+    alt: "Sunny Hotel building",
+    caption: "Hotel reception with large open windows"
+  },
+  {
+    path: "https://images.unsplash.com/photo-1551660209-9ceaab86a803?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1510&h=1000&fit=crop&ixid=eyJhcHBfaWQiOjF9",
+    alt: "Snowboarder image gallery",
+    caption: "Lone snowboarder on a slope"
+  },
+  {
+    path: "https://images.unsplash.com/photo-1551376347-075b0121a65b?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1510&h=1000&fit=crop&ixid=eyJhcHBfaWQiOjF9",
+    alt: "Pink hills image gallery",
+    caption: "Pink haze over hills"
+  }
+]
+
+ReactDOM.render( &#x3C;ImageGallery images={images} /&#x3E;, imageGallery )</code></pre>
+
+          <h5 class="mt-3">Component</h5>
+          <pre class="language-js"><code class="language-js">import React, {Component} from &#x27;react&#x27;;
+
+class ImageGallery extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showLightbox: false
+    }
+  }
+
+  // Handle Keydown function with event parameter
+  handleKeyDown = (event) =&#x3E; {
+    // If the lightbox is showing
+    if(this.state.showLightbox) {
+      // Define buttons and keycodes
+      let lastArrow = document.querySelector(&#x22;.lightbox .arrows .arrows__right&#x22;)
+      let closeIcon = document.querySelector(&#x22;.lightbox .close-button&#x22;)
+      let TAB = 9
+      let ESCAPE_KEY = 27
+      let LEFT_ARROW = 37
+      let RIGHT_ARROW = 39
+      // If esc is clicked, call the close function
+      if(event.keyCode == ESCAPE_KEY) this.onClose()
+      // If left arrow is clicked, call the changeImage function
+      if(event.keyCode == LEFT_ARROW) this.changeImage(-1)
+      // If left arrow is clicked, call the changeImage function
+      if(event.keyCode == RIGHT_ARROW) this.changeImage(1)
+      // If tab is clicked, keep focus on the arrows
+      if(event.keyCode == TAB &#x26;&#x26; document.activeElement == lastArrow) {
+        closeIcon.focus()
+      }
+    }
+  }
+
+  // onClick function
+  onClick = (e, key) =&#x3E; {
+    // Prevent default action (href=&#x22;#&#x22;)
+    e.preventDefault()
+    /*
+      Set state:
+        activeImage = the image&#x27;s index in the array of images
+        showLightbox = true
+      Callback:
+        - Get left arrow button and focus on it
+        - Add no scroll class to body
+        - Call scrollToThumb function
+    */
+    this.setState({
+      activeImage: key,
+      showLightbox: true
+    }, () =&#x3E; {
+      document.querySelector(&#x22;.lightbox .arrows .arrows__left&#x22;).focus()
+      document.body.classList.add(&#x22;no-scroll&#x22;)
+      this.scrollToThumb()
+    })
+  }
+
+  // onClose function
+  onClose = () =&#x3E; {
+    /*
+      Set state:
+        showLightbox = false
+      Callback:
+        - Remove no scroll class from body
+    */
+    this.setState({
+      showLightbox: false
+    }, () =&#x3E; document.body.classList.remove(&#x22;no-scroll&#x22;))
+  }
+
+  // changeImage function
+  changeImage = (calc) =&#x3E; {
+    // If first image is active and parameter is -1
+    if (this.state.activeImage == 0 &#x26;&#x26; calc == -1) {
+      // set parameter to the length of the array to go right to the last image
+      calc = this.props.images.length - 1
+    }
+    // If last image is active and parameter is 1
+    else if (this.state.activeImage == (this.props.images.length -1) &#x26;&#x26; calc == 1) {
+      // set parameter to the (negative)length of the array to go right to the first image
+      calc = -(this.props.images.length -1)
+    }
+    /*
+      Set state:
+        activeImage = selected image + or - calc amount
+      Callback:
+        - Call scrollToThumb function
+    */
+    this.setState(state =&#x3E; ({
+      activeImage: state.activeImage + calc
+    }), () =&#x3E; this.scrollToThumb())
+  }
+
+  // scrollToThumb function
+  scrollToThumb = () =&#x3E; {
+    /* Define variables for:
+      - Thumbs div
+      - First thumbnail div
+      - Active thumbnail div
+      - X-axis offset of first div
+    */
+    let thumbs = document.querySelector(&#x22;.thumbs&#x22;)
+    let firstThumb = document.querySelectorAll(&#x22;.thumb&#x22;)[0]
+    let activeThumb = document.querySelector(&#x22;.thumb--active&#x22;)
+    let firstOffset = firstThumb.offsetLeft
+    // Set the scroll position to show the selected thumb with some space to the left (200px)
+    thumbs.scrollLeft = activeThumb.offsetLeft - firstOffset - 200
+  }
+
+  // Render the images on the page
+  renderImages = () =&#x3E; {
+    // Get first 7 images
+    const cleanedImages = this.props.images.slice(0, 7)
+    // Amount of images
+    const amount = cleanedImages.length
+    // Map images and display a grid item for each of them.
+    const images = cleanedImages.map((image, i) =&#x3E; {
+      // If it is the 7th image
+      if(amount == i + 1) {
+        return (
+          &#x3C;a
+            href=&#x22;#&#x22;
+            key={i+100}
+            className=&#x22;col-12 col-sm-4 mb-4 mb-sm-4&#x22;
+            onClick={e =&#x3E; this.onClick(e, i)}
+          &#x3E;
+            &#x3C;img
+              src={image.path}
+              alt={image.alt}
+              className=&#x22;img-fluid gallery-image&#x22;
+            /&#x3E;
+          &#x3C;/a&#x3E;
+        )
+      }
+      // If it is the 6th image
+      else if((amount - 1) == i + 1) {
+        return (
+          &#x3C;a
+            href=&#x22;#&#x22;
+            key={i}
+            className=&#x22;col-6 col-sm-4 mb-4 mb-sm-4&#x22;
+            onClick={e =&#x3E; this.onClick(e, i)}
+          &#x3E;
+            &#x3C;img
+              src={image.path}
+              alt={image.alt}
+              className=&#x22;img-fluid gallery-image&#x22;
+            /&#x3E;
+          &#x3C;/a&#x3E;
+        )
+      }
+      // If it is the 5th image
+      else if((amount - 2) == i + 1) {
+        return (
+          &#x3C;a
+            href=&#x22;#&#x22;
+            key={i}
+            className=&#x22;col-6 col-sm-4 mb-4 mb-sm-4&#x22;
+            onClick={e =&#x3E; this.onClick(e, i)}
+          &#x3E;
+            &#x3C;img
+              src={image.path}
+              alt={image.alt}
+              className=&#x22;img-fluid gallery-image&#x22;
+            /&#x3E;
+          &#x3C;/a&#x3E;
+        )
+      }
+      // For all other images
+      else {
+        return (
+          &#x3C;a
+            href=&#x22;#&#x22;
+            key={i}
+            className=&#x22;col-6 col-sm-3 mb-4 mb-sm-4&#x22;
+            onClick={e =&#x3E; this.onClick(e, i)}
+          &#x3E;
+            &#x3C;img
+              src={image.path}
+              alt={image.alt}
+              className=&#x22;img-fluid gallery-image&#x22;
+            /&#x3E;
+          &#x3C;/a&#x3E;
+        )
+      }
+    })
+    return images
+  }
+
+  // Render the lightbox div
+  renderLightbox = () =&#x3E; {
+    // Listen for keydown event and call function
+    document.addEventListener(&#x22;keydown&#x22;, this.handleKeyDown)
+    const lightbox = (
+      &#x3C;div className={&#x60;lightbox ${this.state.showLightbox ? &#x22;lightbox--visible&#x22; : &#x22;&#x22;}&#x60;}&#x3E;
+        &#x3C;button
+          className=&#x22;float-right close-button&#x22;
+          onClick={e =&#x3E; this.onClose(e)}
+        /&#x3E;
+        {this.renderImage()}
+        {this.renderCounter()}
+        &#x3C;div className=&#x22;thumbs mx-auto&#x22;&#x3E;
+          {this.renderThumbnails()}
+        &#x3C;/div&#x3E;
+        {this.renderNavigation()}
+      &#x3C;/div&#x3E;
+    )
+    return lightbox
+  }
+
+  // Render featured image
+  renderImage = () =&#x3E; {
+    return (
+      &#x3C;figure className=&#x22;d-none d-md-block text-center&#x22;&#x3E;
+        &#x3C;img
+          src={this.props.images[this.state.activeImage].path}
+          alt={this.props.images[this.state.activeImage].alt}
+          className=&#x22;featuredImage mt-md-4 mx-md-auto text-center&#x22;
+        /&#x3E;
+        &#x3C;figcaption className=&#x22;caption mt-1 mx-auto&#x22;&#x3E;{this.props.images[this.state.activeImage].caption}&#x3C;/figcaption&#x3E;
+      &#x3C;/figure&#x3E;
+    )
+  }
+
+  // Render image counter to show user which image they are viewing
+  renderCounter = () =&#x3E; {
+    return (
+      &#x3C;p className=&#x22;counter d-none d-md-block text-center&#x22;&#x3E;
+        {&#x60;Image ${this.state.activeImage + 1}/${this.props.images.length}&#x60;}
+      &#x3C;/p&#x3E;
+    )
+  }
+
+  // Render navigation arrows
+  renderNavigation = () =&#x3E; {
+    return (
+      &#x3C;div className=&#x22;arrows&#x22;&#x3E;
+        &#x3C;button
+          className=&#x22;arrows__left&#x22;
+          onClick={e =&#x3E; this.changeImage(-1)}
+        /&#x3E;
+        &#x3C;button
+          className=&#x22;arrows__right&#x22;
+          onClick={e =&#x3E; this.changeImage(1)}
+        /&#x3E;
+      &#x3C;/div&#x3E;
+    )
+  }
+
+  // Render thumbnails in lightbox
+  renderThumbnails = () =&#x3E; {
+    const thumbs = this.props.images.map((image, i) =&#x3E; {
+      return (
+        &#x3C;div
+          key={i}
+          className={&#x60;thumb mb-3 mb-md-0 ${i === this.state.activeImage ? &#x22; thumb--active&#x22; : &#x22;&#x22;}&#x60;}
+          onClick={e =&#x3E; this.onClick(e, i)}
+        &#x3E;
+          &#x3C;figure&#x3E;
+            &#x3C;img
+              src={this.props.images[i].path}
+              alt={this.props.images[i].alt}
+              className=&#x22;img-fluid mx-auto&#x22;
+            /&#x3E;
+            &#x3C;figcaption className=&#x22;caption mt-1 mx-auto d-md-none&#x22;&#x3E;{this.props.images[i].caption}&#x3C;/figcaption&#x3E;
+          &#x3C;/figure&#x3E;
+        &#x3C;/div&#x3E;
+      )
+    })
+    return thumbs
+  }
+
+  // Final Render function
+  render() {
+    return (
+      &#x3C;div className=&#x22;row&#x22;&#x3E;
+        {this.renderImages()}
+        {this.state.showLightbox ? this.renderLightbox() : null}
+      &#x3C;/div&#x3E;
+    );
+  }
+}
+
+export default ImageGallery</code></pre>
+
+<h5 class="mt-3">Styles</h5>
+
+<pre class="language-css"><code class="language-css">// Bootstrap
+@import 'bootstrap/bootstrap.scss';
+
+@import url('https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700');
+
+body {
+  font-family: 'Ubuntu Mono', monospace, 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  position: relative;
+
+  &.no-scroll {
+    overflow:hidden;
+  }
+}
+
+.gallery-image {
+  cursor: pointer;
+}
+
+.lightbox {
+  display: none;
+  z-index: 1000;
+  overflow: scroll;
+
+  &--visible {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(#000, .9);
+    color: #fff;
+
+    .featuredImage {
+      width: 95%;
+      height: auto;
+
+      @include media-breakpoint-up(md) {
+        margin-top: 48px;
+        width: 75%;
+      }
+
+      @include media-breakpoint-up(lg) {
+        width: 50%;
+      }
+
+      @media (min-width: 1800px) {
+        margin-top: 96px;
+      }
+    }
+
+    .caption {
+      width: 95%;
+      margin-bottom: 24px;
+
+      @include media-breakpoint-up(md) {
+        width: 75%;
+        text-align: center;
+      }
+
+      @include media-breakpoint-up(lg) {
+        width: 50%;
+      }
+    }
+
+    .thumbs {
+      width: 95%;
+      display: block;
+
+      @include media-breakpoint-up(md) {
+        width: 75%;
+        overflow: hidden;
+        scroll-behavior: smooth;
+        overflow-x:scroll;
+        white-space:nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      @include media-breakpoint-up(lg) {
+        width: 50%;
+      }
+
+      @include media-breakpoint-up(xxl) {
+        display: flex;
+        justify-content: center;
+      }
+
+      .thumb {
+        width: 100%;
+        margin-top: 24px;
+        cursor: pointer;
+
+        @include media-breakpoint-up(md) {
+          width: 100px;
+          display:inline-block;
+          margin-right: 14px;
+
+          &:last-of-type {
+            margin-right: 0;
+          }
+        }
+
+        &--active {
+          @include media-breakpoint-up(md) {
+            border: 2px solid #fff;
+          }
+        }
+
+        figure {
+          margin: 0;
+        }
+
+        img {
+          width: 100%;
+        }
+
+        .caption {
+          width: 100%;
+          margin-bottom: 24px;
+
+          @include media-breakpoint-up(md) {
+            margin-bottom: 48px;
+            width: 75%;
+          }
+
+          @include media-breakpoint-up(lg) {
+            width: 50%;
+          }
+        }
+      }
+    }
+
+    .close-button {
+      position: fixed;
+      width: 48px;
+      height: 48px;
+      right: 0;
+      margin: 18px 21px;
+      background: transparent url("/assets/images/close.svg") no-repeat center center / contain;
+      border: none;
+      cursor: pointer;
+
+      @include media-breakpoint-up(md) {
+        position: absolute;
+        margin: 1% 1%;
+      }
+
+      @include media-breakpoint-up(xxl) {
+        margin: 2% 25%;
+      }
+    }
+
+    .arrows {
+      display: none;
+
+      @include media-breakpoint-up(md) {
+        position: relative;
+        display: block;
+        margin-top: -50%;
+      }
+
+      @include media-breakpoint-up(lg) {
+        margin-top: -31%;
+      }
+
+      @include media-breakpoint-up(xxl) {
+        position: relative;
+        display: block;
+        margin-top: -25%;
+      }
+
+      &__left {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background: url("/assets/images/left-arrow.svg") no-repeat center center / contain;
+        left: 5%;
+        border: none;
+        cursor: pointer;
+
+        @include media-breakpoint-up(lg) {
+          left: 20%;
+        }
+      }
+
+      &__right {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background: url("/assets/images/right-arrow.svg") no-repeat center center / contain;
+        right: 5%;
+        border: none;
+        cursor: pointer;
+
+        @include media-breakpoint-up(lg) {
+          right: 20%;
+        }
+      }
+    }
+  }
+}
+</code>
+</pre>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

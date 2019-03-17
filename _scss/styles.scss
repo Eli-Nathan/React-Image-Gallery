@@ -1,9 +1,10 @@
 // Bootstrap
 @import 'bootstrap/bootstrap.scss';
 
-@import url('https://fonts.googleapis.com/css?family=Varela+Round');
+@import url('https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700');
 
 body {
+  font-family: 'Ubuntu Mono', monospace, 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   position: relative;
 
   &.no-scroll {
@@ -103,6 +104,10 @@ body {
           @include media-breakpoint-up(md) {
             border: 2px solid #fff;
           }
+        }
+
+        figure {
+          margin: 0;
         }
 
         img {

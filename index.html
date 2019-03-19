@@ -34,21 +34,46 @@ current: home
   </div>
 </div>
 
-<div class="gallery">
+<div class="gallery mb-5">
   <div class="container">
     <div id="image-gallery"></div>
+  </div>
+</div>
+
+<div class="intro mt-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <p>By simply passing a props to the gallery we can change the layout. For example, passing <code class="language-js p-sm-2">style="grid"</code>, we can get a basic grid layout.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="gallery2">
+  <div class="container">
+    <div id="image-gallery2"></div>
   </div>
 </div>
 
 <div class="code mt-5">
   <div class="container">
     <div class="row">
-      <div class="col-md-10 offset-md-1 code-section">
+      <div class="col-md-12 code-section">
         <div class="container code-snippets">
           <h2 class="text-center my-3">View code</h2>
           <hr>
-          <h5>Main JS file</h5>
-          <pre class="language-js"><code class="language-js">import React from 'react'
+          <figure>
+            <figcaption>Markup</figcaption>
+            <pre class="language-markup"><code class="language-markup">&#x3C;div class=&#x22;gallery&#x22;&#x3E;
+  &#x3C;div class=&#x22;container&#x22;&#x3E;
+    &#x3C;div id=&#x22;image-gallery&#x22;&#x3E;&#x3C;/div&#x3E;
+  &#x3C;/div&#x3E;
+&#x3C;/div&#x3E;</code></pre>
+          </figure>
+          <figure>
+            <figcaption>Main JS file</figcaption>
+              <pre class="language-js"><code class="language-js">import React from 'react'
 import ReactDOM from 'react-dom'
 import ImageGallery from './components/ImageGallery'
 
@@ -107,8 +132,10 @@ const images = [
 ]
 
 ReactDOM.render( &#x3C;ImageGallery images={images} /&#x3E;, imageGallery )</code></pre>
+</figure>
 
-          <h5 class="mt-3">Component</h5>
+<figure>
+  <figcaption>Component</figcaption>
           <pre class="language-js"><code class="language-js">import React, {Component} from &#x27;react&#x27;;
 
 class ImageGallery extends Component {
@@ -125,9 +152,10 @@ class ImageGallery extends Component {
     // If the lightbox is showing
     if(this.state.showLightbox) {
       // Define buttons and keycodes
+      let firstArrow = document.querySelector(&#x22;.lightbox .arrows .arrows__left&#x22;)
       let lastArrow = document.querySelector(&#x22;.lightbox .arrows .arrows__right&#x22;)
       let closeIcon = document.querySelector(&#x22;.lightbox .close-button&#x22;)
-      let TAB = 9
+      let TAB_KEY = 9
       let ESCAPE_KEY = 27
       let LEFT_ARROW = 37
       let RIGHT_ARROW = 39
@@ -138,8 +166,34 @@ class ImageGallery extends Component {
       // If left arrow is clicked, call the changeImage function
       if(event.keyCode == RIGHT_ARROW) this.changeImage(1)
       // If tab is clicked, keep focus on the arrows
-      if(event.keyCode == TAB &#x26;&#x26; document.activeElement == lastArrow) {
-        closeIcon.focus()
+      if(event.keyCode == TAB_KEY &#x26;&#x26; !event.shiftKey) {
+        console.log(document.activeElement);
+        if(document.activeElement == firstArrow) {
+          event.preventDefault()
+          lastArrow.focus()
+        }
+        else if(document.activeElement == lastArrow) {
+          event.preventDefault()
+          closeIcon.focus()
+        }
+        else {
+          event.preventDefault()
+          firstArrow.focus()
+        }
+      }
+      if(event.keyCode == TAB_KEY &#x26;&#x26; event.shiftKey) {
+        if(document.activeElement == firstArrow) {
+          event.preventDefault()
+          closeIcon.focus()
+        }
+        else if(document.activeElement == lastArrow) {
+          event.preventDefault()
+          firstArrow.focus()
+        }
+        else {
+          event.preventDefault()
+          lastArrow.focus()
+        }
       }
     }
   }
@@ -206,135 +260,132 @@ class ImageGallery extends Component {
   // scrollToThumb function
   scrollToThumb = () =&#x3E; {
     /* Define variables for:
+      - Lightbox div
       - Thumbs div
       - First thumbnail div
       - Active thumbnail div
+      - The offsetTop of the clicked thumbnail on mobile devices
       - X-axis offset of first div
     */
+    let lightbox = document.querySelector(&#x22;.lightbox&#x22;)
     let thumbs = document.querySelector(&#x22;.thumbs&#x22;)
     let firstThumb = document.querySelectorAll(&#x22;.thumb&#x22;)[0]
     let activeThumb = document.querySelector(&#x22;.thumb--active&#x22;)
+    let activeTop = document.querySelector(&#x22;.thumb--active&#x22;).offsetTop
     let firstOffset = firstThumb.offsetLeft
     // Set the scroll position to show the selected thumb with some space to the left (200px)
     thumbs.scrollLeft = activeThumb.offsetLeft - firstOffset - 200
+    // Set the scroll top to scroll to pressed thumbnail image for mobile devices
+    lightbox.scrollTop = activeTop - 30;
+
   }
 
-  // Render the images on the page
+  /*
+    galleryImage function
+    Parameters:
+      - cols = Chassis columns defined based on the selected style and which image it is
+      - path = image.path
+      - alt = image.alt
+      - i = image number
+  */
+  galleryImage = (cols, path, alt, i) =&#x3E; {
+    return (
+      &#x3C;div
+        className={cols}
+        key={i+100}
+      &#x3E;
+        &#x3C;a
+          onClick={e =&#x3E; this.onClick(e, i)}
+          href=&#x22;#&#x22;
+        &#x3E;
+          &#x3C;div className=&#x22;gallery-image&#x22;&#x3E;
+            &#x3C;img
+              src={path}
+              alt={alt}
+              className=&#x22;ch-img--responsive ch-hand gallery-image__image&#x22;
+            /&#x3E;
+            &#x3C;div className=&#x22;gallery-image__overlay&#x22;&#x3E;
+            &#x3C;/div&#x3E;
+          &#x3C;/div&#x3E;
+        &#x3C;/a&#x3E;
+      &#x3C;/div&#x3E;
+    )
+  }
+
+  // renderImages function
   renderImages = () =&#x3E; {
-    // Get first 7 images
-    const cleanedImages = this.props.images.slice(0, 7)
-    // Amount of images
+    let cols
+    const maxImages = this.props.style == &#x22;4/3&#x22; ? 7 : 8
+    // Cleaned images array is the first 7 images
+    const cleanedImages = this.props.images.slice(0, maxImages)
+    // Amount is the length of that array (I&#x27;ve done this incase we change 7 to a different number)
     const amount = cleanedImages.length
-    // Map images and display a grid item for each of them.
+    // Map the images
     const images = cleanedImages.map((image, i) =&#x3E; {
-      // If it is the 7th image
-      if(amount == i + 1) {
-        return (
-          &#x3C;a
-            href=&#x22;#&#x22;
-            key={i+100}
-            className=&#x22;col-12 col-sm-4 mb-4 mb-sm-4&#x22;
-            onClick={e =&#x3E; this.onClick(e, i)}
-          &#x3E;
-            &#x3C;img
-              src={image.path}
-              alt={image.alt}
-              className=&#x22;img-fluid gallery-image&#x22;
-            /&#x3E;
-          &#x3C;/a&#x3E;
-        )
+      // If the defined style is four by 3...
+      if(this.props.style == &#x22;4/3&#x22;) {
+        // Layout for the second and third-last image
+        if((amount - 1) == i + 1 || (amount - 2) == i + 1) cols = &#x22;col-6 col-sm-4 mb-4 mb-sm-4&#x22;
+        // Layout for the last image
+        else if(amount == i + 1) cols = &#x22;col-12 col-sm-4 mb-4 mb-sm-4&#x22;
+        // Otherwise, layout is just a simple grid
+        else cols = &#x22;col-6 col-sm-3 mb-4 mb-sm-4&#x22;
       }
-      // If it is the 6th image
-      else if((amount - 1) == i + 1) {
-        return (
-          &#x3C;a
-            href=&#x22;#&#x22;
-            key={i}
-            className=&#x22;col-6 col-sm-4 mb-4 mb-sm-4&#x22;
-            onClick={e =&#x3E; this.onClick(e, i)}
-          &#x3E;
-            &#x3C;img
-              src={image.path}
-              alt={image.alt}
-              className=&#x22;img-fluid gallery-image&#x22;
-            /&#x3E;
-          &#x3C;/a&#x3E;
-        )
-      }
-      // If it is the 5th image
-      else if((amount - 2) == i + 1) {
-        return (
-          &#x3C;a
-            href=&#x22;#&#x22;
-            key={i}
-            className=&#x22;col-6 col-sm-4 mb-4 mb-sm-4&#x22;
-            onClick={e =&#x3E; this.onClick(e, i)}
-          &#x3E;
-            &#x3C;img
-              src={image.path}
-              alt={image.alt}
-              className=&#x22;img-fluid gallery-image&#x22;
-            /&#x3E;
-          &#x3C;/a&#x3E;
-        )
-      }
-      // For all other images
-      else {
-        return (
-          &#x3C;a
-            href=&#x22;#&#x22;
-            key={i}
-            className=&#x22;col-6 col-sm-3 mb-4 mb-sm-4&#x22;
-            onClick={e =&#x3E; this.onClick(e, i)}
-          &#x3E;
-            &#x3C;img
-              src={image.path}
-              alt={image.alt}
-              className=&#x22;img-fluid gallery-image&#x22;
-            /&#x3E;
-          &#x3C;/a&#x3E;
-        )
-      }
+      else if (!this.props.style || this.props.style == &#x22;grid&#x22;) cols = &#x22;col-6 col-sm-3 mb-4 mb-sm-4&#x22;
+      // Return an image from the galleryImage function based on the parameters from above
+      return (
+        this.galleryImage(cols, image.path, image.alt, i)
+      )
     })
+    // Return images
     return images
   }
 
-  // Render the lightbox div
   renderLightbox = () =&#x3E; {
     // Listen for keydown event and call function
     document.addEventListener(&#x22;keydown&#x22;, this.handleKeyDown)
     const lightbox = (
       &#x3C;div className={&#x60;lightbox ${this.state.showLightbox ? &#x22;lightbox--visible&#x22; : &#x22;&#x22;}&#x60;}&#x3E;
+        {this.renderImage()}
+        {this.renderCounter()}
+        &#x3C;div className={&#x60;thumbs mx-auto ${this.props.images.length &#x3C; 11 ? &#x22;flex-xxl&#x22; : &#x22;&#x22;}&#x60;}&#x3E;
+          {this.renderThumbnails()}
+        &#x3C;/div&#x3E;
         &#x3C;button
           className=&#x22;float-right close-button&#x22;
           onClick={e =&#x3E; this.onClose(e)}
         /&#x3E;
-        {this.renderImage()}
-        {this.renderCounter()}
-        &#x3C;div className=&#x22;thumbs mx-auto&#x22;&#x3E;
-          {this.renderThumbnails()}
-        &#x3C;/div&#x3E;
-        {this.renderNavigation()}
       &#x3C;/div&#x3E;
     )
     return lightbox
   }
 
-  // Render featured image
   renderImage = () =&#x3E; {
     return (
-      &#x3C;figure className=&#x22;d-none d-md-block text-center&#x22;&#x3E;
-        &#x3C;img
-          src={this.props.images[this.state.activeImage].path}
-          alt={this.props.images[this.state.activeImage].alt}
-          className=&#x22;featuredImage mt-md-4 mx-md-auto text-center&#x22;
-        /&#x3E;
-        &#x3C;figcaption className=&#x22;caption mt-1 mx-auto&#x22;&#x3E;{this.props.images[this.state.activeImage].caption}&#x3C;/figcaption&#x3E;
-      &#x3C;/figure&#x3E;
+      &#x3C;div className=&#x22;d-none d-md-flex text-center imageContainer&#x22;&#x3E;
+        &#x3C;figure&#x3E;
+          &#x3C;div className=&#x22;overlays mx-auto&#x22;&#x3E;
+            &#x3C;div
+              className=&#x22;overlay&#x22;
+              onClick={e =&#x3E; this.changeImage(-1)}
+            /&#x3E;
+            &#x3C;div
+              className=&#x22;overlay&#x22;
+              onClick={e =&#x3E; this.changeImage(1)}
+            /&#x3E;
+          &#x3C;/div&#x3E;
+          &#x3C;img
+            src={this.props.images[this.state.activeImage].path}
+            alt={this.props.images[this.state.activeImage].alt}
+            className=&#x22;featuredImage mt-md-4 mx-md-auto text-center&#x22;
+          /&#x3E;
+          &#x3C;figcaption className=&#x22;caption mt-1 mx-auto mb-4 text-center&#x22;&#x3E;{this.props.images[this.state.activeImage].caption}&#x3C;/figcaption&#x3E;
+        &#x3C;/figure&#x3E;
+        {this.renderNavigation()}
+      &#x3C;/div&#x3E;
     )
   }
 
-  // Render image counter to show user which image they are viewing
   renderCounter = () =&#x3E; {
     return (
       &#x3C;p className=&#x22;counter d-none d-md-block text-center&#x22;&#x3E;
@@ -343,38 +394,36 @@ class ImageGallery extends Component {
     )
   }
 
-  // Render navigation arrows
   renderNavigation = () =&#x3E; {
     return (
-      &#x3C;div className=&#x22;arrows&#x22;&#x3E;
+      &#x3C;div className=&#x22;arrows d-none d-md-block&#x22;&#x3E;
         &#x3C;button
-          className=&#x22;arrows__left&#x22;
+          className=&#x22;arrow arrows__left position-absolute&#x22;
           onClick={e =&#x3E; this.changeImage(-1)}
         /&#x3E;
         &#x3C;button
-          className=&#x22;arrows__right&#x22;
+          className=&#x22;arrow arrows__right position-absolute&#x22;
           onClick={e =&#x3E; this.changeImage(1)}
         /&#x3E;
       &#x3C;/div&#x3E;
     )
   }
 
-  // Render thumbnails in lightbox
   renderThumbnails = () =&#x3E; {
     const thumbs = this.props.images.map((image, i) =&#x3E; {
       return (
         &#x3C;div
           key={i}
-          className={&#x60;thumb mb-3 mb-md-0 ${i === this.state.activeImage ? &#x22; thumb--active&#x22; : &#x22;&#x22;}&#x60;}
+          className={&#x60;thumb d-md-inline-block mb-3 mb-md-0 mt-4 mt-md-2 mr-md-2${i === this.state.activeImage ? &#x22; thumb--active border-3 border-white&#x22; : &#x22;&#x22;}&#x60;}
           onClick={e =&#x3E; this.onClick(e, i)}
         &#x3E;
           &#x3C;figure&#x3E;
             &#x3C;img
               src={this.props.images[i].path}
               alt={this.props.images[i].alt}
-              className=&#x22;img-fluid mx-auto&#x22;
+              className=&#x22;img-fluid mx-auto mt-4 mt-md-0&#x22;
             /&#x3E;
-            &#x3C;figcaption className=&#x22;caption mt-1 mx-auto d-md-none&#x22;&#x3E;{this.props.images[i].caption}&#x3C;/figcaption&#x3E;
+            &#x3C;figcaption className=&#x22;caption mt-1 mx-auto mb-4 mb-md-5 d-md-none&#x22;&#x3E;{this.props.images[i].caption}&#x3C;/figcaption&#x3E;
           &#x3C;/figure&#x3E;
         &#x3C;/div&#x3E;
       )
@@ -382,7 +431,7 @@ class ImageGallery extends Component {
     return thumbs
   }
 
-  // Final Render function
+
   render() {
     return (
       &#x3C;div className=&#x22;row&#x22;&#x3E;
@@ -391,28 +440,76 @@ class ImageGallery extends Component {
       &#x3C;/div&#x3E;
     );
   }
+
 }
 
-export default ImageGallery</code></pre>
+export default ImageGallery
+</code></pre>
+</figure>
 
-<h5 class="mt-3">Styles</h5>
+<figure>
+  <figcaption>Styles</figcaption>
 
 <pre class="language-css"><code class="language-css">// Bootstrap
-@import 'bootstrap/bootstrap.scss';
+@import &#x27;bootstrap/bootstrap.scss&#x27;;
 
-@import url('https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700');
+@import url(&#x27;https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700&#x27;);
 
 body {
-  font-family: 'Ubuntu Mono', monospace, 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: &#x27;Ubuntu Mono&#x27;, monospace, &#x27;Roboto&#x27;, -apple-system, BlinkMacSystemFont, &#x22;Segoe UI&#x22;, Roboto Helvetica, Arial, sans-serif, &#x22;Apple Color Emoji&#x22;, &#x22;Segoe UI Emoji&#x22;, &#x22;Segoe UI Symbol&#x22;;
   position: relative;
 
-  &.no-scroll {
+  &#x26;.no-scroll {
     overflow:hidden;
   }
 }
 
 .gallery-image {
-  cursor: pointer;
+  position: relative;
+  width: 100%;
+
+  &#x26;__image {
+    width: 100%;
+    transition: .5s;
+    overflow: hidden;
+
+    &#x26;:hover {
+      transform: scale(1.2);
+    }
+  }
+
+  &#x26;__overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    transition: .3s ease;
+    background-color: rgba(#fff, .2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &#x26;:hover {
+    .gallery-image__overlay {
+      opacity: 1;
+    }
+  }
+
+  .icon {
+    color: white;
+    font-size: 100px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    text-align: center;
+  }
 }
 
 .lightbox {
@@ -420,7 +517,7 @@ body {
   z-index: 1000;
   overflow: scroll;
 
-  &--visible {
+  &#x26;--visible {
     display: block;
     width: 100vw;
     height: 100vh;
@@ -430,21 +527,63 @@ body {
     background-color: rgba(#000, .9);
     color: #fff;
 
-    .featuredImage {
-      width: 95%;
-      height: auto;
+    .imageContainer {
+      align-items: center;
+      justify-content: center;
 
-      @include media-breakpoint-up(md) {
-        margin-top: 48px;
-        width: 75%;
-      }
+      figure {
+        width: 100vw;
+        position: relative;
+        margin: 0;
 
-      @include media-breakpoint-up(lg) {
-        width: 50%;
-      }
+        .overlays {
+          position: absolute;
 
-      @media (min-width: 1800px) {
-        margin-top: 96px;
+          @include media-breakpoint-up(md) {
+            width: 48%;
+            margin: 0 auto;
+            left: 26%;
+            height: 90%;
+          }
+
+          @include media-breakpoint-up(lg) {
+            height: 92%;
+          }
+
+          @include media-breakpoint-up(xl) {
+            margin-top: $spacer*3;
+            width: 50%;
+            left: 25%;
+            height: 83%;
+          }
+
+          .overlay {
+            width: 50%;
+            height: 100%;
+            float: left;
+          }
+        }
+
+        img {
+          width: 95%;
+
+          @include media-breakpoint-up(md) {
+            width: 48%;
+          }
+
+          @media (min-width: 1800px) {
+            margin-top: $spacer*16;
+            width: 50%;
+          }
+        }
+
+        .caption {
+          width: 95%;
+
+          @include media-breakpoint-up(md) {
+            width: 50%;
+          }
+        }
       }
     }
 
@@ -479,9 +618,11 @@ body {
         width: 50%;
       }
 
-      @include media-breakpoint-up(xxl) {
-        display: flex;
-        justify-content: center;
+      &#x26;.flex-xxl {
+        @include media-breakpoint-up(xxl) {
+          display: flex;
+          justify-content: center;
+        }
       }
 
       .thumb {
@@ -494,12 +635,12 @@ body {
           display:inline-block;
           margin-right: 14px;
 
-          &:last-of-type {
+          &#x26;:last-of-type {
             margin-right: 0;
           }
         }
 
-        &--active {
+        &#x26;--active {
           @include media-breakpoint-up(md) {
             border: 2px solid #fff;
           }
@@ -534,8 +675,9 @@ body {
       width: 48px;
       height: 48px;
       right: 0;
+      top: 0;
       margin: 18px 21px;
-      background: transparent url("/assets/images/close.svg") no-repeat center center / contain;
+      background: transparent url(&#x22;/assets/images/close.svg&#x22;) no-repeat center center / contain;
       border: none;
       cursor: pointer;
 
@@ -543,53 +685,34 @@ body {
         position: absolute;
         margin: 1% 1%;
       }
-
-      @include media-breakpoint-up(xxl) {
-        margin: 2% 25%;
-      }
     }
 
     .arrows {
-      display: none;
-
-      @include media-breakpoint-up(md) {
-        position: relative;
-        display: block;
-        margin-top: -50%;
-      }
-
-      @include media-breakpoint-up(lg) {
-        margin-top: -31%;
-      }
-
-      @include media-breakpoint-up(xxl) {
-        position: relative;
-        display: block;
-        margin-top: -25%;
-      }
-
-      &__left {
-        position: absolute;
+      .arrow {
         width: 50px;
         height: 50px;
-        background: url("/assets/images/left-arrow.svg") no-repeat center center / contain;
-        left: 5%;
         border: none;
         cursor: pointer;
+      }
+
+      &#x26;__left {
+        background: url(&#x22;/assets/images/left-arrow.svg&#x22;) no-repeat center center / contain;
+
+        @include media-breakpoint-up(md) {
+          left: 19%;
+        }
 
         @include media-breakpoint-up(lg) {
           left: 20%;
         }
       }
 
-      &__right {
-        position: absolute;
-        width: 50px;
-        height: 50px;
-        background: url("/assets/images/right-arrow.svg") no-repeat center center / contain;
-        right: 5%;
-        border: none;
-        cursor: pointer;
+      &#x26;__right {
+        background: url(&#x22;/assets/images/right-arrow.svg&#x22;) no-repeat center center / contain;
+
+        @include media-breakpoint-up(md) {
+          right: 19%;
+        }
 
         @include media-breakpoint-up(lg) {
           right: 20%;

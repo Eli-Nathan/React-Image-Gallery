@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import ImageGallery from './components/ImageGallery'
 
 let imageGallery = document.getElementById("image-gallery")
+let imageGallery2 = document.getElementById("image-gallery2")
 
 const images = [
   {
@@ -57,4 +58,6 @@ const images = [
   }
 ]
 
-ReactDOM.render( <ImageGallery images={images} />, imageGallery )
+ReactDOM.render( <ImageGallery images={images} style={"4/3"} />, imageGallery )
+
+ReactDOM.render( <ImageGallery images={images} style={"grid"} />, imageGallery2 )

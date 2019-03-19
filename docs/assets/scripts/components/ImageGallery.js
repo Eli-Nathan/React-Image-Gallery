@@ -22,11 +22,11 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -42,13 +42,14 @@ function (_Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(ImageGallery).call(this, props));
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "handleKeyDown", function (event) {
+    _defineProperty(_assertThisInitialized(_this), "handleKeyDown", function (event) {
       // If the lightbox is showing
       if (_this.state.showLightbox) {
         // Define buttons and keycodes
+        var firstArrow = document.querySelector(".lightbox .arrows .arrows__left");
         var lastArrow = document.querySelector(".lightbox .arrows .arrows__right");
         var closeIcon = document.querySelector(".lightbox .close-button");
-        var TAB = 9;
+        var TAB_KEY = 9;
         var ESCAPE_KEY = 27;
         var LEFT_ARROW = 37;
         var RIGHT_ARROW = 39; // If esc is clicked, call the close function
@@ -59,13 +60,37 @@ function (_Component) {
 
         if (event.keyCode == RIGHT_ARROW) _this.changeImage(1); // If tab is clicked, keep focus on the arrows
 
-        if (event.keyCode == TAB && document.activeElement == lastArrow) {
-          closeIcon.focus();
+        if (event.keyCode == TAB_KEY && !event.shiftKey) {
+          console.log(document.activeElement);
+
+          if (document.activeElement == firstArrow) {
+            event.preventDefault();
+            lastArrow.focus();
+          } else if (document.activeElement == lastArrow) {
+            event.preventDefault();
+            closeIcon.focus();
+          } else {
+            event.preventDefault();
+            firstArrow.focus();
+          }
+        }
+
+        if (event.keyCode == TAB_KEY && event.shiftKey) {
+          if (document.activeElement == firstArrow) {
+            event.preventDefault();
+            closeIcon.focus();
+          } else if (document.activeElement == lastArrow) {
+            event.preventDefault();
+            firstArrow.focus();
+          } else {
+            event.preventDefault();
+            lastArrow.focus();
+          }
         }
       }
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "onClick", function (e, key) {
+    _defineProperty(_assertThisInitialized(_this), "onClick", function (e, key) {
       // Prevent default action (href="#")
       e.preventDefault();
       /*
@@ -89,7 +114,7 @@ function (_Component) {
       });
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "onClose", function () {
+    _defineProperty(_assertThisInitialized(_this), "onClose", function () {
       /*
         Set state:
           showLightbox = false
@@ -103,7 +128,7 @@ function (_Component) {
       });
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "changeImage", function (calc) {
+    _defineProperty(_assertThisInitialized(_this), "changeImage", function (calc) {
       // If first image is active and parameter is -1
       if (_this.state.activeImage == 0 && calc == -1) {
         // set parameter to the length of the array to go right to the last image
@@ -130,149 +155,150 @@ function (_Component) {
       });
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "scrollToThumb", function () {
+    _defineProperty(_assertThisInitialized(_this), "scrollToThumb", function () {
       /* Define variables for:
+        - Lightbox div
         - Thumbs div
         - First thumbnail div
         - Active thumbnail div
+        - The offsetTop of the clicked thumbnail on mobile devices
         - X-axis offset of first div
       */
+      var lightbox = document.querySelector(".lightbox");
       var thumbs = document.querySelector(".thumbs");
       var firstThumb = document.querySelectorAll(".thumb")[0];
       var activeThumb = document.querySelector(".thumb--active");
+      var activeTop = document.querySelector(".thumb--active").offsetTop;
       var firstOffset = firstThumb.offsetLeft; // Set the scroll position to show the selected thumb with some space to the left (200px)
 
-      thumbs.scrollLeft = activeThumb.offsetLeft - firstOffset - 200;
+      thumbs.scrollLeft = activeThumb.offsetLeft - firstOffset - 200; // Set the scroll top to scroll to pressed thumbnail image for mobile devices
+
+      lightbox.scrollTop = activeTop - 30;
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderImages", function () {
-      var cleanedImages = _this.props.images.slice(0, 7);
+    _defineProperty(_assertThisInitialized(_this), "galleryImage", function (cols, path, alt, i) {
+      return _react.default.createElement("div", {
+        className: cols,
+        key: i + 100
+      }, _react.default.createElement("a", {
+        onClick: function onClick(e) {
+          return _this.onClick(e, i);
+        },
+        href: "#"
+      }, _react.default.createElement("div", {
+        className: "gallery-image"
+      }, _react.default.createElement("img", {
+        src: path,
+        alt: alt,
+        className: "ch-img--responsive ch-hand gallery-image__image"
+      }), _react.default.createElement("div", {
+        className: "gallery-image__overlay"
+      }))));
+    });
 
-      var amount = cleanedImages.length;
+    _defineProperty(_assertThisInitialized(_this), "renderImages", function () {
+      var cols;
+      var maxImages = _this.props.style == "4/3" ? 7 : 8; // Cleaned images array is the first 7 images
+
+      var cleanedImages = _this.props.images.slice(0, maxImages); // Amount is the length of that array (I've done this incase we change 7 to a different number)
+
+
+      var amount = cleanedImages.length; // Map the images
+
       var images = cleanedImages.map(function (image, i) {
-        if (amount == i + 1) {
-          return _react.default.createElement("a", {
-            href: "#",
-            key: i + 100,
-            className: "col-12 col-sm-4 mb-4 mb-sm-4",
-            onClick: function onClick(e) {
-              return _this.onClick(e, i);
-            }
-          }, _react.default.createElement("img", {
-            src: image.path,
-            alt: image.alt,
-            className: "img-fluid gallery-image"
-          }));
-        } else if (amount - 1 == i + 1) {
-          return _react.default.createElement("a", {
-            href: "#",
-            key: i,
-            className: "col-6 col-sm-4 mb-4 mb-sm-4",
-            onClick: function onClick(e) {
-              return _this.onClick(e, i);
-            }
-          }, _react.default.createElement("img", {
-            src: image.path,
-            alt: image.alt,
-            className: "img-fluid gallery-image"
-          }));
-        } else if (amount - 2 == i + 1) {
-          return _react.default.createElement("a", {
-            href: "#",
-            key: i,
-            className: "col-6 col-sm-4 mb-4 mb-sm-4",
-            onClick: function onClick(e) {
-              return _this.onClick(e, i);
-            }
-          }, _react.default.createElement("img", {
-            src: image.path,
-            alt: image.alt,
-            className: "img-fluid gallery-image"
-          }));
-        } else {
-          return _react.default.createElement("a", {
-            href: "#",
-            key: i,
-            className: "col-6 col-sm-3 mb-4 mb-sm-4",
-            onClick: function onClick(e) {
-              return _this.onClick(e, i);
-            }
-          }, _react.default.createElement("img", {
-            src: image.path,
-            alt: image.alt,
-            className: "img-fluid gallery-image"
-          }));
-        }
-      });
+        // If the defined style is four by 3...
+        if (_this.props.style == "4/3") {
+          // Layout for the second and third-last image
+          if (amount - 1 == i + 1 || amount - 2 == i + 1) cols = "col-6 col-sm-4 mb-4 mb-sm-4"; // Layout for the last image
+          else if (amount == i + 1) cols = "col-12 col-sm-4 mb-4 mb-sm-4"; // Otherwise, layout is just a simple grid
+            else cols = "col-6 col-sm-3 mb-4 mb-sm-4";
+        } else if (!_this.props.style || _this.props.style == "grid") cols = "col-6 col-sm-3 mb-4 mb-sm-4"; // Return an image from the galleryImage function based on the parameters from above
+
+
+        return _this.galleryImage(cols, image.path, image.alt, i);
+      }); // Return images
+
       return images;
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderLightbox", function () {
+    _defineProperty(_assertThisInitialized(_this), "renderLightbox", function () {
       // Listen for keydown event and call function
       document.addEventListener("keydown", _this.handleKeyDown);
 
       var lightbox = _react.default.createElement("div", {
         className: "lightbox ".concat(_this.state.showLightbox ? "lightbox--visible" : "")
-      }, _react.default.createElement("button", {
+      }, _this.renderImage(), _this.renderCounter(), _react.default.createElement("div", {
+        className: "thumbs mx-auto ".concat(_this.props.images.length < 11 ? "flex-xxl" : "")
+      }, _this.renderThumbnails()), _react.default.createElement("button", {
         className: "float-right close-button",
         onClick: function onClick(e) {
           return _this.onClose(e);
         }
-      }), _this.renderImage(), _this.renderCounter(), _react.default.createElement("div", {
-        className: "thumbs mx-auto"
-      }, _this.renderThumbnails()), _this.renderNavigation());
+      }));
 
       return lightbox;
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderImage", function () {
-      return _react.default.createElement("figure", {
-        className: "d-none d-md-block text-center"
-      }, _react.default.createElement("img", {
+    _defineProperty(_assertThisInitialized(_this), "renderImage", function () {
+      return _react.default.createElement("div", {
+        className: "d-none d-md-flex text-center imageContainer"
+      }, _react.default.createElement("figure", null, _react.default.createElement("div", {
+        className: "overlays mx-auto"
+      }, _react.default.createElement("div", {
+        className: "overlay",
+        onClick: function onClick(e) {
+          return _this.changeImage(-1);
+        }
+      }), _react.default.createElement("div", {
+        className: "overlay",
+        onClick: function onClick(e) {
+          return _this.changeImage(1);
+        }
+      })), _react.default.createElement("img", {
         src: _this.props.images[_this.state.activeImage].path,
         alt: _this.props.images[_this.state.activeImage].alt,
         className: "featuredImage mt-md-4 mx-md-auto text-center"
       }), _react.default.createElement("figcaption", {
-        className: "caption mt-1 mx-auto"
-      }, _this.props.images[_this.state.activeImage].caption));
+        className: "caption mt-1 mx-auto mb-4 text-center"
+      }, _this.props.images[_this.state.activeImage].caption)), _this.renderNavigation());
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderCounter", function () {
+    _defineProperty(_assertThisInitialized(_this), "renderCounter", function () {
       return _react.default.createElement("p", {
         className: "counter d-none d-md-block text-center"
       }, "Image ".concat(_this.state.activeImage + 1, "/").concat(_this.props.images.length));
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderNavigation", function () {
+    _defineProperty(_assertThisInitialized(_this), "renderNavigation", function () {
       return _react.default.createElement("div", {
-        className: "arrows"
+        className: "arrows d-none d-md-block"
       }, _react.default.createElement("button", {
-        className: "arrows__left",
+        className: "arrow arrows__left position-absolute",
         onClick: function onClick(e) {
           return _this.changeImage(-1);
         }
       }), _react.default.createElement("button", {
-        className: "arrows__right",
+        className: "arrow arrows__right position-absolute",
         onClick: function onClick(e) {
           return _this.changeImage(1);
         }
       }));
     });
 
-    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "renderThumbnails", function () {
+    _defineProperty(_assertThisInitialized(_this), "renderThumbnails", function () {
       var thumbs = _this.props.images.map(function (image, i) {
         return _react.default.createElement("div", {
           key: i,
-          className: "thumb mb-3 mb-md-0 ".concat(i === _this.state.activeImage ? " thumb--active" : ""),
+          className: "thumb d-md-inline-block mb-3 mb-md-0 mt-4 mt-md-2 mr-md-2".concat(i === _this.state.activeImage ? " thumb--active border-3 border-white" : ""),
           onClick: function onClick(e) {
             return _this.onClick(e, i);
           }
         }, _react.default.createElement("figure", null, _react.default.createElement("img", {
           src: _this.props.images[i].path,
           alt: _this.props.images[i].alt,
-          className: "img-fluid mx-auto"
+          className: "img-fluid mx-auto mt-4 mt-md-0"
         }), _react.default.createElement("figcaption", {
-          className: "caption mt-1 mx-auto d-md-none"
+          className: "caption mt-1 mx-auto mb-4 mb-md-5 d-md-none"
         }, _this.props.images[i].caption)));
       });
 
@@ -595,6 +621,7 @@ var printWarning = function() {};
 if (process.env.NODE_ENV !== 'production') {
   var ReactPropTypesSecret = require('./lib/ReactPropTypesSecret');
   var loggedTypeFailures = {};
+  var has = Function.call.bind(Object.prototype.hasOwnProperty);
 
   printWarning = function(text) {
     var message = 'Warning: ' + text;
@@ -624,7 +651,7 @@ if (process.env.NODE_ENV !== 'production') {
 function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
   if (process.env.NODE_ENV !== 'production') {
     for (var typeSpecName in typeSpecs) {
-      if (typeSpecs.hasOwnProperty(typeSpecName)) {
+      if (has(typeSpecs, typeSpecName)) {
         var error;
         // Prop type validation may throw. In case they do, we don't want to
         // fail the render phase where it didn't fail before. So we log it.
@@ -652,8 +679,7 @@ function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
             'You may have forgotten to pass an argument to the type checker ' +
             'creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and ' +
             'shape all require an argument).'
-          )
-
+          );
         }
         if (error instanceof Error && !(error.message in loggedTypeFailures)) {
           // Only monitor this failure once because there tends to be a lot of the
@@ -668,6 +694,17 @@ function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
         }
       }
     }
+  }
+}
+
+/**
+ * Resets warning cache when testing.
+ *
+ * @private
+ */
+checkPropTypes.resetWarningCache = function() {
+  if (process.env.NODE_ENV !== 'production') {
+    loggedTypeFailures = {};
   }
 }
 
@@ -691,7 +728,7 @@ module.exports = ReactPropTypesSecret;
 
 },{}],6:[function(require,module,exports){
 (function (process){
-/** @license React v16.8.1
+/** @license React v16.8.4
  * react.development.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -713,7 +750,7 @@ var checkPropTypes = require('prop-types/checkPropTypes');
 
 // TODO: this is special because it gets imported during build.
 
-var ReactVersion = '16.8.1';
+var ReactVersion = '16.8.4';
 
 // The Symbol used to tag the ReactElement-like types. If there is no native Symbol
 // nor polyfill, then a plain number is used for performance.
@@ -2596,7 +2633,7 @@ module.exports = react;
 }).call(this,require('_process'))
 
 },{"_process":3,"object-assign":2,"prop-types/checkPropTypes":4}],7:[function(require,module,exports){
-/** @license React v16.8.1
+/** @license React v16.8.4
  * react.production.min.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -2619,7 +2656,7 @@ function fa(a,b,d){var c=a.result,e=a.keyPrefix;a=a.func.call(a.context,b,a.coun
 var X={Children:{map:function(a,b,d){if(null==a)return a;var c=[];V(a,c,null,b,d);return c},forEach:function(a,b,d){if(null==a)return a;b=Q(null,null,b,d);U(a,ea,b);R(b)},count:function(a){return U(a,function(){return null},null)},toArray:function(a){var b=[];V(a,b,null,function(a){return a});return b},only:function(a){N(a)?void 0:B("143");return a}},createRef:function(){return{current:null}},Component:E,PureComponent:G,createContext:function(a,b){void 0===b&&(b=null);a={$$typeof:w,_calculateChangedBits:b,
 _currentValue:a,_currentValue2:a,_threadCount:0,Provider:null,Consumer:null};a.Provider={$$typeof:v,_context:a};return a.Consumer=a},forwardRef:function(a){return{$$typeof:y,render:a}},lazy:function(a){return{$$typeof:ba,_ctor:a,_status:-1,_result:null}},memo:function(a,b){return{$$typeof:aa,type:a,compare:void 0===b?null:b}},useCallback:function(a,b){return W().useCallback(a,b)},useContext:function(a,b){return W().useContext(a,b)},useEffect:function(a,b){return W().useEffect(a,b)},useImperativeHandle:function(a,
 b,d){return W().useImperativeHandle(a,b,d)},useDebugValue:function(){},useLayoutEffect:function(a,b){return W().useLayoutEffect(a,b)},useMemo:function(a,b){return W().useMemo(a,b)},useReducer:function(a,b,d){return W().useReducer(a,b,d)},useRef:function(a){return W().useRef(a)},useState:function(a){return W().useState(a)},Fragment:r,StrictMode:t,Suspense:z,createElement:M,cloneElement:function(a,b,d){null===a||void 0===a?B("267",a):void 0;var c=void 0,e=k({},a.props),g=a.key,h=a.ref,f=a._owner;if(null!=
-b){void 0!==b.ref&&(h=b.ref,f=J.current);void 0!==b.key&&(g=""+b.key);var l=void 0;a.type&&a.type.defaultProps&&(l=a.type.defaultProps);for(c in b)K.call(b,c)&&!L.hasOwnProperty(c)&&(e[c]=void 0===b[c]&&void 0!==l?l[c]:b[c])}c=arguments.length-2;if(1===c)e.children=d;else if(1<c){l=Array(c);for(var m=0;m<c;m++)l[m]=arguments[m+2];e.children=l}return{$$typeof:p,type:a.type,key:g,ref:h,props:e,_owner:f}},createFactory:function(a){var b=M.bind(null,a);b.type=a;return b},isValidElement:N,version:"16.8.1",
+b){void 0!==b.ref&&(h=b.ref,f=J.current);void 0!==b.key&&(g=""+b.key);var l=void 0;a.type&&a.type.defaultProps&&(l=a.type.defaultProps);for(c in b)K.call(b,c)&&!L.hasOwnProperty(c)&&(e[c]=void 0===b[c]&&void 0!==l?l[c]:b[c])}c=arguments.length-2;if(1===c)e.children=d;else if(1<c){l=Array(c);for(var m=0;m<c;m++)l[m]=arguments[m+2];e.children=l}return{$$typeof:p,type:a.type,key:g,ref:h,props:e,_owner:f}},createFactory:function(a){var b=M.bind(null,a);b.type=a;return b},isValidElement:N,version:"16.8.4",
 unstable_ConcurrentMode:x,unstable_Profiler:u,__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED:{ReactCurrentDispatcher:I,ReactCurrentOwner:J,assign:k}},Y={default:X},Z=Y&&X||Y;module.exports=Z.default||Z;
 
 },{"object-assign":2}],8:[function(require,module,exports){

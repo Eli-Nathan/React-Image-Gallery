@@ -14,9 +14,10 @@ class ImageGallery extends Component {
     // If the lightbox is showing
     if(this.state.showLightbox) {
       // Define buttons and keycodes
+      let firstArrow = document.querySelector(".lightbox .arrows .arrows__left")
       let lastArrow = document.querySelector(".lightbox .arrows .arrows__right")
       let closeIcon = document.querySelector(".lightbox .close-button")
-      let TAB = 9
+      let TAB_KEY = 9
       let ESCAPE_KEY = 27
       let LEFT_ARROW = 37
       let RIGHT_ARROW = 39
@@ -27,8 +28,34 @@ class ImageGallery extends Component {
       // If left arrow is clicked, call the changeImage function
       if(event.keyCode == RIGHT_ARROW) this.changeImage(1)
       // If tab is clicked, keep focus on the arrows
-      if(event.keyCode == TAB && document.activeElement == lastArrow) {
-        closeIcon.focus()
+      if(event.keyCode == TAB_KEY && !event.shiftKey) {
+        console.log(document.activeElement);
+        if(document.activeElement == firstArrow) {
+          event.preventDefault()
+          lastArrow.focus()
+        }
+        else if(document.activeElement == lastArrow) {
+          event.preventDefault()
+          closeIcon.focus()
+        }
+        else {
+          event.preventDefault()
+          firstArrow.focus()
+        }
+      }
+      if(event.keyCode == TAB_KEY && event.shiftKey) {
+        if(document.activeElement == firstArrow) {
+          event.preventDefault()
+          closeIcon.focus()
+        }
+        else if(document.activeElement == lastArrow) {
+          event.preventDefault()
+          firstArrow.focus()
+        }
+        else {
+          event.preventDefault()
+          lastArrow.focus()
+        }
       }
     }
   }
@@ -95,88 +122,84 @@ class ImageGallery extends Component {
   // scrollToThumb function
   scrollToThumb = () => {
     /* Define variables for:
+      - Lightbox div
       - Thumbs div
       - First thumbnail div
       - Active thumbnail div
+      - The offsetTop of the clicked thumbnail on mobile devices
       - X-axis offset of first div
     */
+    let lightbox = document.querySelector(".lightbox")
     let thumbs = document.querySelector(".thumbs")
     let firstThumb = document.querySelectorAll(".thumb")[0]
     let activeThumb = document.querySelector(".thumb--active")
+    let activeTop = document.querySelector(".thumb--active").offsetTop
     let firstOffset = firstThumb.offsetLeft
     // Set the scroll position to show the selected thumb with some space to the left (200px)
     thumbs.scrollLeft = activeThumb.offsetLeft - firstOffset - 200
+    // Set the scroll top to scroll to pressed thumbnail image for mobile devices
+    lightbox.scrollTop = activeTop - 30;
+
   }
 
+  /*
+    galleryImage function
+    Parameters:
+      - cols = Chassis columns defined based on the selected style and which image it is
+      - path = image.path
+      - alt = image.alt
+      - i = image number
+  */
+  galleryImage = (cols, path, alt, i) => {
+    return (
+      <div
+        className={cols}
+        key={i+100}
+      >
+        <a
+          onClick={e => this.onClick(e, i)}
+          href="#"
+        >
+          <div className="gallery-image">
+            <img
+              src={path}
+              alt={alt}
+              className="ch-img--responsive ch-hand gallery-image__image"
+            />
+            <div className="gallery-image__overlay">
+            </div>
+          </div>
+        </a>
+      </div>
+    )
+  }
+
+  // renderImages function
   renderImages = () => {
-    const cleanedImages = this.props.images.slice(0, 7)
+    let cols
+    const maxImages = this.props.style == "4/3" ? 7 : 8
+    // Cleaned images array is the first 7 images
+    const cleanedImages = this.props.images.slice(0, maxImages)
+    // Amount is the length of that array (I've done this incase we change 7 to a different number)
     const amount = cleanedImages.length
+    // Map the images
     const images = cleanedImages.map((image, i) => {
-      if(amount == i + 1) {
-        return (
-          <a
-            href="#"
-            key={i+100}
-            className="col-12 col-sm-4 mb-4 mb-sm-4"
-            onClick={e => this.onClick(e, i)}
-          >
-            <img
-              src={image.path}
-              alt={image.alt}
-              className="img-fluid gallery-image"
-            />
-          </a>
-        )
+      // If the defined style is four by 3...
+      if(this.props.style == "4/3") {
+        // Layout for the second and third-last image
+        if((amount - 1) == i + 1 || (amount - 2) == i + 1) cols = "col-6 col-sm-4 mb-4 mb-sm-4"
+        // Layout for the last image
+        else if(amount == i + 1) cols = "col-12 col-sm-4 mb-4 mb-sm-4"
+        // Otherwise, layout is just a simple grid
+        else cols = "col-6 col-sm-3 mb-4 mb-sm-4"
       }
-      else if((amount - 1) == i + 1) {
-        return (
-          <a
-            href="#"
-            key={i}
-            className="col-6 col-sm-4 mb-4 mb-sm-4"
-            onClick={e => this.onClick(e, i)}
-          >
-            <img
-              src={image.path}
-              alt={image.alt}
-              className="img-fluid gallery-image"
-            />
-          </a>
-        )
-      }
-      else if((amount - 2) == i + 1) {
-        return (
-          <a
-            href="#"
-            key={i}
-            className="col-6 col-sm-4 mb-4 mb-sm-4"
-            onClick={e => this.onClick(e, i)}
-          >
-            <img
-              src={image.path}
-              alt={image.alt}
-              className="img-fluid gallery-image"
-            />
-          </a>
-        )
-      }
-      else {
-        return (
-          <a
-            href="#"
-            key={i}
-            className="col-6 col-sm-3 mb-4 mb-sm-4"
-            onClick={e => this.onClick(e, i)}
-          >
-            <img
-              src={image.path}
-              alt={image.alt}
-              className="img-fluid gallery-image"
-            />
-          </a>
-        )
-      }
+      else if (!this.props.style || this.props.style == "grid") cols = "col-6 col-sm-3 mb-4 mb-sm-4"
+      // Return an image from the galleryImage function based on the parameters from above
+      return (
+        this.galleryImage(cols, image.path, image.alt, i)
+      )
     })
+    // Return images
     return images
   }
 
@@ -185,16 +208,15 @@ class ImageGallery extends Component {
     document.addEventListener("keydown", this.handleKeyDown)
     const lightbox = (
       <div className={`lightbox ${this.state.showLightbox ? "lightbox--visible" : ""}`}>
+        {this.renderImage()}
+        {this.renderCounter()}
+        <div className={`thumbs mx-auto ${this.props.images.length < 11 ? "flex-xxl" : ""}`}>
+          {this.renderThumbnails()}
+        </div>
         <button
           className="float-right close-button"
           onClick={e => this.onClose(e)}
         />
-        {this.renderImage()}
-        {this.renderCounter()}
-        <div className="thumbs mx-auto">
-          {this.renderThumbnails()}
-        </div>
-        {this.renderNavigation()}
       </div>
     )
     return lightbox
@@ -202,14 +224,27 @@ class ImageGallery extends Component {
 
   renderImage = () => {
     return (
-      <figure className="d-none d-md-block text-center">
-        <img
-          src={this.props.images[this.state.activeImage].path}
-          alt={this.props.images[this.state.activeImage].alt}
-          className="featuredImage mt-md-4 mx-md-auto text-center"
-        />
-        <figcaption className="caption mt-1 mx-auto">{this.props.images[this.state.activeImage].caption}</figcaption>
-      </figure>
+      <div className="d-none d-md-flex text-center imageContainer">
+        <figure>
+          <div className="overlays mx-auto">
+            <div
+              className="overlay"
+              onClick={e => this.changeImage(-1)}
+            />
+            <div
+              className="overlay"
+              onClick={e => this.changeImage(1)}
+            />
+          </div>
+          <img
+            src={this.props.images[this.state.activeImage].path}
+            alt={this.props.images[this.state.activeImage].alt}
+            className="featuredImage mt-md-4 mx-md-auto text-center"
+          />
+          <figcaption className="caption mt-1 mx-auto mb-4 text-center">{this.props.images[this.state.activeImage].caption}</figcaption>
+        </figure>
+        {this.renderNavigation()}
+      </div>
     )
   }
 
@@ -223,13 +258,13 @@ class ImageGallery extends Component {
 
   renderNavigation = () => {
     return (
-      <div className="arrows">
+      <div className="arrows d-none d-md-block">
         <button
-          className="arrows__left"
+          className="arrow arrows__left position-absolute"
           onClick={e => this.changeImage(-1)}
         />
         <button
-          className="arrows__right"
+          className="arrow arrows__right position-absolute"
           onClick={e => this.changeImage(1)}
         />
       </div>
@@ -241,16 +276,16 @@ class ImageGallery extends Component {
       return (
         <div
           key={i}
-          className={`thumb mb-3 mb-md-0 ${i === this.state.activeImage ? " thumb--active" : ""}`}
+          className={`thumb d-md-inline-block mb-3 mb-md-0 mt-4 mt-md-2 mr-md-2${i === this.state.activeImage ? " thumb--active border-3 border-white" : ""}`}
           onClick={e => this.onClick(e, i)}
         >
           <figure>
             <img
               src={this.props.images[i].path}
               alt={this.props.images[i].alt}
-              className="img-fluid mx-auto"
+              className="img-fluid mx-auto mt-4 mt-md-0"
             />
-            <figcaption className="caption mt-1 mx-auto d-md-none">{this.props.images[i].caption}</figcaption>
+            <figcaption className="caption mt-1 mx-auto mb-4 mb-md-5 d-md-none">{this.props.images[i].caption}</figcaption>
           </figure>
         </div>
       )

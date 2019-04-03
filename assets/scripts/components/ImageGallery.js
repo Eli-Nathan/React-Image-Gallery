@@ -176,7 +176,27 @@ function (_Component) {
       lightbox.scrollTop = activeTop - 30;
     });
 
-    _defineProperty(_assertThisInitialized(_this), "galleryImage", function (cols, path, alt, i) {
+    _defineProperty(_assertThisInitialized(_this), "renderOverlay", function (maxImages, i) {
+      // Set overflow images to the amount of EXTRA images not showing on page
+      var overflowImages = _this.props.images.length - maxImages; // plural Or No is set to "s" if there is more than one and blank if there is just one
+
+      var pluralOrNo = overflowImages > 1 ? "s" : ""; // If there are more images than the max amount showing AND it is the last image
+
+      if (_this.props.images.length > maxImages && i == maxImages) {
+        // Return an overlay with an extra class and content showing the amount of images left
+        return _react.default.createElement("div", {
+          className: "gallery-image__overlay gallery-image__overlay--last"
+        }, "+".concat(overflowImages, " more image").concat(pluralOrNo));
+      } // Otherwise...
+      else {
+          // Return the blank overlay
+          return _react.default.createElement("div", {
+            className: "gallery-image__overlay"
+          });
+        }
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "galleryImage", function (cols, path, alt, maxImages, i) {
       return _react.default.createElement("div", {
         className: cols,
         key: i + 100
@@ -191,14 +211,23 @@ function (_Component) {
         src: path,
         alt: alt,
         className: "ch-img--responsive ch-hand gallery-image__image"
-      }), _react.default.createElement("div", {
-        className: "gallery-image__overlay"
-      }))));
+      }), _this.renderOverlay(maxImages, i + 1))));
     });
 
     _defineProperty(_assertThisInitialized(_this), "renderImages", function () {
       var cols;
-      var maxImages = _this.props.style == "4/3" ? 7 : 8; // Cleaned images array is the first 7 images
+      var maxImages;
+
+      if (_this.props.layout == "4/3") {
+        maxImages = 7;
+      } else if (_this.props.layout == 4) {
+        maxImages = 4;
+      } else if (_this.props.layout == 6) {
+        maxImages = 6;
+      } else {
+        maxImages = _this.props.layout == "4/3" ? 7 : 8;
+      } // Cleaned images array is the first 7 images
+
 
       var cleanedImages = _this.props.images.slice(0, maxImages); // Amount is the length of that array (I've done this incase we change 7 to a different number)
 
@@ -207,15 +236,19 @@ function (_Component) {
 
       var images = cleanedImages.map(function (image, i) {
         // If the defined style is four by 3...
-        if (_this.props.style == "4/3") {
+        if (_this.props.layout == "4/3") {
           // Layout for the second and third-last image
           if (amount - 1 == i + 1 || amount - 2 == i + 1) cols = "col-6 col-sm-4 mb-4 mb-sm-4"; // Layout for the last image
           else if (amount == i + 1) cols = "col-12 col-sm-4 mb-4 mb-sm-4"; // Otherwise, layout is just a simple grid
             else cols = "col-6 col-sm-3 mb-4 mb-sm-4";
-        } else if (!_this.props.style || _this.props.style == "grid") cols = "col-6 col-sm-3 mb-4 mb-sm-4"; // Return an image from the galleryImage function based on the parameters from above
+        } // If the defined style is four by 3...
+        else if (_this.props.layout == 6) {
+            // Layout is just a simple grid
+            cols = "col-6 col-sm-4 mb-4 mb-sm-4";
+          } else if (!_this.props.style || _this.props.style == "grid" || _this.props.layout == 4) cols = "col-6 col-sm-3 mb-4 mb-sm-4"; // Return an image from the galleryImage function based on the parameters from above
 
 
-        return _this.galleryImage(cols, image.path, image.alt, i);
+        return _this.galleryImage(cols, image.path, image.alt, maxImages, i);
       }); // Return images
 
       return images;

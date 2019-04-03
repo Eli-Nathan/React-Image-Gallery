@@ -143,6 +143,33 @@ class ImageGallery extends Component {
   }
 
   /*
+    renderOverlay function
+    Parameters:
+      - maxImages = based on the layout prop, how many images are the maximum that will show on page
+      - i = the current image number
+  */
+  renderOverlay = (maxImages, i) => {
+    // Set overflow images to the amount of EXTRA images not showing on page
+    let overflowImages = this.props.images.length - maxImages
+    // plural Or No is set to "s" if there is more than one and blank if there is just one
+    let pluralOrNo = overflowImages > 1 ? "s" : ""
+    // If there are more images than the max amount showing AND it is the last image
+    if (this.props.images.length > maxImages && i == maxImages) {
+      // Return an overlay with an extra class and content showing the amount of images left
+      return(
+        <div className="gallery-image__overlay gallery-image__overlay--last">
+          {`+${overflowImages} more image${pluralOrNo}`}
+        </div>
+      )
+    }
+    // Otherwise...
+    else {
+      // Return the blank overlay
+      return <div className="gallery-image__overlay" />
+    }
+  }
+
+  /*
     galleryImage function
     Parameters:
       - cols = Chassis columns defined based on the selected style and which image it is
@@ -150,7 +177,7 @@ class ImageGallery extends Component {
       - alt = image.alt
       - i = image number
   */
-  galleryImage = (cols, path, alt, i) => {
+  galleryImage = (cols, path, alt, maxImages, i) => {
     return (
       <div
         className={cols}
@@ -166,8 +193,7 @@ class ImageGallery extends Component {
               alt={alt}
               className="ch-img--responsive ch-hand gallery-image__image"
             />
-            <div className="gallery-image__overlay">
-            </div>
+            {this.renderOverlay(maxImages, (i+1))}
           </div>
         </a>
       </div>
@@ -177,7 +203,19 @@ class ImageGallery extends Component {
   // renderImages function
   renderImages = () => {
     let cols
-    const maxImages = this.props.style == "4/3" ? 7 : 8
+    let maxImages
+    if (this.props.layout == "4/3") {
+      maxImages = 7
+    }
+    else if (this.props.layout == 4) {
+      maxImages = 4
+    }
+    else if (this.props.layout == 6) {
+      maxImages = 6
+    }
+    else {
+      maxImages = this.props.layout == "4/3" ? 7 : 8
+    }
     // Cleaned images array is the first 7 images
     const cleanedImages = this.props.images.slice(0, maxImages)
     // Amount is the length of that array (I've done this incase we change 7 to a different number)
@@ -185,7 +223,7 @@ class ImageGallery extends Component {
     // Map the images
     const images = cleanedImages.map((image, i) => {
       // If the defined style is four by 3...
-      if(this.props.style == "4/3") {
+      if(this.props.layout == "4/3") {
         // Layout for the second and third-last image
         if((amount - 1) == i + 1 || (amount - 2) == i + 1) cols = "col-6 col-sm-4 mb-4 mb-sm-4"
         // Layout for the last image
@@ -193,10 +231,15 @@ class ImageGallery extends Component {
         // Otherwise, layout is just a simple grid
         else cols = "col-6 col-sm-3 mb-4 mb-sm-4"
       }
-      else if (!this.props.style || this.props.style == "grid") cols = "col-6 col-sm-3 mb-4 mb-sm-4"
+      // If the defined style is four by 3...
+      else if(this.props.layout == 6) {
+        // Layout is just a simple grid
+        cols = "col-6 col-sm-4 mb-4 mb-sm-4"
+      }
+      else if (!this.props.style || this.props.style == "grid" || this.props.layout == 4) cols = "col-6 col-sm-3 mb-4 mb-sm-4"
       // Return an image from the galleryImage function based on the parameters from above
       return (
-        this.galleryImage(cols, image.path, image.alt, i)
+        this.galleryImage(cols, image.path, image.alt, maxImages, i)
       )
     })
     // Return images

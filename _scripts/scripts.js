@@ -58,6 +58,6 @@ const images = [
   }
 ]
 
-ReactDOM.render( <ImageGallery images={images} style={"4/3"} />, imageGallery )
+ReactDOM.render( <ImageGallery images={images} layout={"4/3"} />, imageGallery )
 
-ReactDOM.render( <ImageGallery images={images} style={"grid"} />, imageGallery2 )
+ReactDOM.render( <ImageGallery images={images} layout={"grid"} />, imageGallery2 )
